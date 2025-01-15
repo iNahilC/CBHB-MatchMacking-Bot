@@ -1,0 +1,27 @@
+{
+  "name": "cbhb-matchmacking-bot",
+  "version": "0.0.1",
+  "description": "A Discord bot for the CB:HB MatchMacking server.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "iNahilC.",
+  "type": "commonjs",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^11.7.2",
+    "discord.js": "^14.17.3",
+    "mathjs": "^10.5.1",
+    "moment": "^2.29.3",
+    "moment-duration-format": "^2.3.2",
+    "moment-timezone": "^0.5.34",
+    "node-datetime": "^2.1.2",
+    "path": "^0.12.7",
+    "quick.db": "^9.0.5",
+    "randomstring": "^1.2.2",
+    "request": "^2.88.2",
+    "string-similarity": "^4.0.4",
+    "table": "^6.8.0"
+  }
+}
