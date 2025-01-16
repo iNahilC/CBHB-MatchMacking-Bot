@@ -19,8 +19,7 @@ const {
   WebhookClient,
   ButtonBuilder,
   ActionRowBuilder,
-  SelectMenuBuilder,
-  SelectMenuOptionBuilder,
+  ButtonStyle,
   ActivityFlagsBitField,
   BitField,
   Collection,
@@ -97,7 +96,8 @@ const {
   Webhook,
   WebSocket,
   Routes,
-  REST
+  REST,
+  ComponentType,
 } = require('discord.js');
 
 module.exports = {
@@ -115,6 +115,7 @@ module.exports = {
   WebhookClient,
   ButtonBuilder,
   ActionRowBuilder,
+  ButtonStyle,
   ActivityFlagsBitField,
   BitField,
   Collection,
@@ -190,4 +191,5 @@ module.exports = {
   VoiceState,
   Webhook,
   WebSocket,
+  ComponentType,
 };
