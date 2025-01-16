@@ -128,5 +128,3 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-json.sqlite
-src/ConfigBot/clases/Client.js
