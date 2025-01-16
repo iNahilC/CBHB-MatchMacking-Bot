@@ -11,13 +11,13 @@ function initializeClientProperties(client) {
       channel: "1327694588814823459",
       message: "1327753713749852203",
       ranks: {
-        rango7: "1327694586893832207", // Rango 7
-        rango6: "1327694586893832206", // Rango 6
-        rango5: "1327694586893832205", // Rango 5
-        rango4: "1327694586893832204", // Rango 4
-        rango3: "1327694586893832203", // Rango 3
-        rango2: "1327694586893832202", // Rango 2
-        rango1: "1327694586864341119" // Rango 1
+        rango6: "1327694586893832207", // Rango 6
+        rango5: "1327694586893832206", // Rango 5
+        rango4: "1327694586893832205", // Rango 4
+        rango3: "1327694586893832204", // Rango 3
+        rango2: "1327694586893832203", // Rango 2
+        rango1: "1327694586893832202", // Rango 1
+        rango0: "1327694586864341119" // Rango 0
       }
     }
   
