@@ -1,4 +1,7 @@
+const { QuickDB } = require("quick.db");
+
 function initializeClientProperties(client) {
+    client.db = new QuickDB();
     client.colorDefault = "#2F3136";
     client.servidor_oficial = "719351217616322602";
     client.servidor_test = "656754930652151808";
