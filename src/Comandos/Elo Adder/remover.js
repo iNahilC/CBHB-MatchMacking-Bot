@@ -1,6 +1,6 @@
 const { SlashCommand, EmbedBuilder, PermissionsBitField } = require("../../ConfigBot/index.js");
-const { updateEloTable } = require("../../utilidades/updateEloTable.js");
-const { updateUserRankRole, getRank } = require("../../utilidades/updateUserRankRole.js");
+const { updateEloTable } = require("../../Utilidades/updateEloTable.js");
+const { updateUserRankRole } = require("../../Utilidades/updateUserRankRole.js");
 
 module.exports = new SlashCommand({
   name: "remover",

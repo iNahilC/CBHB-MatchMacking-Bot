@@ -1,6 +1,6 @@
 const { Evento } = require("../../ConfigBot/index");
-const { updateEloTable } = require("../../utilidades/updateEloTable");
-const { updateUserRankRole } = require("../../utilidades/updateUserRankRole");
+const { updateEloTable } = require("../../Utilidades/updateEloTable");
+const { updateUserRankRole } = require("../../Utilidades/updateUserRankRole");
 
 module.exports = new Evento({
   nombre: "ready",

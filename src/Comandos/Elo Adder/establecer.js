@@ -1,6 +1,6 @@
 const { SlashCommand, EmbedBuilder, PermissionsBitField } = require("../../ConfigBot/index.js");
-const { updateEloTable } = require("../../utilidades/updateEloTable.js");
-const { updateUserRankRole, getRank } = require("../../utilidades/updateUserRankRole.js");
+const { updateEloTable } = require("../../Utilidades/updateEloTable.js");
+const { updateUserRankRole, getRank } = require("../../Utilidades/updateUserRankRole.js");
 
 module.exports = new SlashCommand({
   name: "establecer",
@@ -128,7 +128,7 @@ module.exports = new SlashCommand({
 
     let respuestaFinal = "";
     resultados.forEach((result) => {
-      respuestaFinal += `\nSe **__sobreescribió__** correctamente **${result.cantidadElo}** de **elo** a **<@${result.userId}>**. `;    
+      respuestaFinal += `\nSe **__sobreescribió__** correctamente a **${Math.min(result.cantidadElo, 2300)}** de **elo** a **<@${result.userId}>**. `;    
     });
 
     respuestaFinal += "\n";
