@@ -1,12 +1,12 @@
 async function updateUserRankRole(client, guildId, userId) {
     const RANGOS = [
-        { eloMinimo: 1800, eloMaximo: 2300, roleId: client.elo.ranks.rango7, rango: "⑥" }, // Rango 6
-        { eloMinimo: 1300, eloMaximo: 1799, roleId: client.elo.ranks.rango6, rango: "⑤" }, // Rango 5
-        { eloMinimo: 1000, eloMaximo: 1299, roleId: client.elo.ranks.rango5, rango: "④" }, // Rango 4
-        { eloMinimo: 500, eloMaximo: 999, roleId: client.elo.ranks.rango4, rango: "③" },   // Rango 3
-        { eloMinimo: 300, eloMaximo: 499, roleId: client.elo.ranks.rango3, rango: "②" },   // Rango 2
-        { eloMinimo: 50, eloMaximo: 299, roleId: client.elo.ranks.rango2, rango: "①" },    // Rango 1
-        { eloMinimo: 0, eloMaximo: 49, roleId: client.elo.ranks.rango1, rango: "⓪" }       // Rango 0
+        { eloMinimo: 1800, eloMaximo: 2300, roleId: client.elo.ranks.rango6, rango: "⑥" }, // Rango 6
+        { eloMinimo: 1300, eloMaximo: 1799, roleId: client.elo.ranks.rango5, rango: "⑤" }, // Rango 5
+        { eloMinimo: 1000, eloMaximo: 1299, roleId: client.elo.ranks.rango4, rango: "④" }, // Rango 4
+        { eloMinimo: 500, eloMaximo: 999, roleId: client.elo.ranks.rango3, rango: "③" },   // Rango 3
+        { eloMinimo: 300, eloMaximo: 499, roleId: client.elo.ranks.rango2, rango: "②" },   // Rango 2
+        { eloMinimo: 50, eloMaximo: 299, roleId: client.elo.ranks.rango1, rango: "①" },    // Rango 1
+        { eloMinimo: 0, eloMaximo: 49, roleId: client.elo.ranks.rango0, rango: "⓪" }       // Rango 0
     ];
 
     const guild = client.guilds.cache.get(guildId);
