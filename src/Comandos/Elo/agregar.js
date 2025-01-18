@@ -88,9 +88,9 @@ module.exports = new SlashCommand({
 
       let usuarioElo = elo.find((entry) => entry.user_id === userId);
       if (usuarioElo) {
-        usuarioElo.elo = Math.min(usuarioElo.elo + cantidadElo, 2300); // Limitar a 2300 de ELO
+        usuarioElo.elo = Math.min(usuarioElo.elo + cantidadElo, 10000); // Limitar a 10000 de ELO
       } else {
-        usuarioElo = { user_id: userId, elo: Math.min(cantidadElo, 2300) }; // Limitar a 2300 de ELO
+        usuarioElo = { user_id: userId, elo: Math.min(cantidadElo, 10000) }; // Limitar a 10000 de ELO
         elo.push(usuarioElo);
       }
 
@@ -131,7 +131,7 @@ module.exports = new SlashCommand({
     let respuestaFinal = "";
     resultados.forEach((result) => {
       console.log(result)
-      respuestaFinal += `\nSe **__agregó__** correctamente **${Math.min(result.cantidadElo, 2300)}** de elo a <@${result.userId}>. Elo total: **${result.totalElo}**. `;
+      respuestaFinal += `\nSe **__agregó__** correctamente **${Math.min(result.cantidadElo, 10000)}** de elo a <@${result.userId}>. Elo total: **${result.totalElo}**. `;
     });
 
     respuestaFinal += "\n";

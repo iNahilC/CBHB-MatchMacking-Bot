@@ -1,6 +1,6 @@
 const { Evento } = require("../../ConfigBot/index");
 const { Console } = require("../../ConfigBot/utilidades/ClientConsole");
-const { initializeClientProperties } = require("../../utilidades/initializeClientProperties");
+const { initializeClientProperties } = require("../../Utilidades/initializeClientProperties");
 
 module.exports = new Evento({
   nombre: "ready",

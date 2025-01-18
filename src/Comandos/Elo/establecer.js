@@ -90,9 +90,9 @@ module.exports = new SlashCommand({
 
       let usuarioElo = elo.find((entry) => entry.user_id === userId);
       if (usuarioElo) {
-        usuarioElo.elo = Math.min(cantidadElo, 2300);
+        usuarioElo.elo = Math.min(cantidadElo, 10000);
       } else {
-        elo.push({ user_id: userId, elo: Math.min(cantidadElo, 2300) });
+        elo.push({ user_id: userId, elo: Math.min(cantidadElo, 10000) });
       }
 
       resultados.push({ userId, cantidadElo, rangoPrevio });
@@ -128,12 +128,12 @@ module.exports = new SlashCommand({
 
     let respuestaFinal = "";
     resultados.forEach((result) => {
-      respuestaFinal += `\nSe **__sobreescribió__** correctamente a **${Math.min(result.cantidadElo, 2300)}** de **elo** a **<@${result.userId}>**. `;    
+      respuestaFinal += `\nSe **__sobreescribió__** correctamente a **${Math.min(result.cantidadElo, 10000)}** de **elo** a **<@${result.userId}>**. `;    
     });
 
     respuestaFinal += "\n";
     if (cambiosRoles.length > 0) {
-      cambiosRoles.forEach((cambio) => {
+      cambiosRoles.forEach((cambio) => {  
         respuestaFinal += `\n<@${cambio.usuario}> ${cambio.tipoCambio}: ${cambio.rango}`;
       });
     }
