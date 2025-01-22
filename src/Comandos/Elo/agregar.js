@@ -130,7 +130,6 @@ module.exports = new SlashCommand({
 
     let respuestaFinal = "";
     resultados.forEach((result) => {
-      console.log(result)
       respuestaFinal += `\nSe **__agregó__** correctamente **${Math.min(result.cantidadElo, 10000)}** de elo a <@${result.userId}>. Elo total: **${result.totalElo}**. `;
     });
 
