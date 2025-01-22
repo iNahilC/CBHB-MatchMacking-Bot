@@ -1,17 +1,18 @@
 const { SlashCommand, EmbedBuilder, PermissionsBitField } = require("../../ConfigBot/index.js");
+const { updateEloTable } = require("../../Utilidades/updateEloTable.js");
 const { updateUserRankRole } = require("../../Utilidades/updateUserRankRole.js");
 
 module.exports = new SlashCommand({
-  name: "rank",
-  category: "Usuarios",
-  description: "Mira el rango tuyo o de un usuario en específico.",
-  example: "/rank | usuario: <@usuario1>",
+  name: "eliminar",
+  category: "Elo Adder",
+  description: "Establece el Elo de un jugador a 0 y le asigna el rango correspondiente.",
+  example: "/eliminar usuarios: <@usuario1><@usuario2>",
   options: [
     {
-      name: "usuario",
-      description: "Menciona al usuario del que deseas ver el rango.",
-      type: 6,
-      required: false,
+      name: "usuarios",
+      description: "Usuarios a los que deseas eliminar el Elo y establecer el rango.",
+      type: 3,
+      required: true,
     },
   ],
   ejecutar: async (client, interaction) => {
@@ -19,39 +20,68 @@ module.exports = new SlashCommand({
       await client.db.set(`${interaction.guild.id}.elo`, []);
     }
 
-    // Determina el usuario para el que se va a mostrar el rango (el invocador si no se menciona a otro usuario)
-    const usuario = interaction.options.getUser("usuario") || interaction.user;
+    if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+      if (!interaction.member.roles.cache.has(client.elo.permissionRol)) {
+        const e = new EmbedBuilder()
+          .setColor(client.constants.colorError)
+          .setDescription(
+            `${client.emojisId.error} **No tienes permisos para usar este comando. Necesitas el rol <@&${client.elo.permissionRol}>.**`
+          );
+        return interaction.reply({ embeds: [e], allowedMentions: { repliedUser: false } });
+      }
+    }
 
-    const elo = await client.db.get(`${interaction.guild.id}.elo`) || [];
-    const usuarioElo = elo.find((entry) => entry.user_id === usuario.id);
+    const usuariosTexto = interaction.options.getString("usuarios");
+    const usuarios = usuariosTexto.match(/<@!?(\d+)>/g);
 
-    // Verifica si se encontró el registro de Elo del usuario
-    if (!usuarioElo) {
+    if (!usuarios || usuarios.length === 0) {
       const e = new EmbedBuilder()
         .setColor(client.constants.colorError)
         .setDescription(
-          `${client.emojisId.error} No se ha encontrado un registro de **elo** para el usuario <@${usuario.id}>.`
+          `${client.emojisId.error} Debes mencionar **__usuarios__** válidos en el campo **"usuarios"**.`
         );
       return interaction.reply({ embeds: [e], allowedMentions: { repliedUser: false } });
     }
 
-    const userElo = usuarioElo.elo;
-    let rangoSymbol = "";
+    const elo = (await client.db.get(`${interaction.guild.id}.elo`)) || [];
+    let resultados = [];
+    let errores = [];
 
-    // Determina el rango según el valor de Elo
-    for (const rango of client.elo.ranks) {
-      if (userElo >= rango.eloMinimo && userElo <= rango.eloMaximo) {
-        rangoSymbol = rango.rango;
-        break;
+    for (let i = 0; i < usuarios.length; i++) {
+      const userId = usuarios[i].replace(/[<@!>]/g, "");
+
+      const usuarioElo = elo.find((entry) => entry.user_id === userId);
+      if (!usuarioElo) {
+        errores.push(`El usuario <@${userId}> **no** se encuentra en la base de datos.`);
+        continue;
+      }
+
+      usuarioElo.elo = 0;
+
+      try {
+        await client.db.set(`${interaction.guild.id}.elo`, elo);
+        await updateUserRankRole(client, interaction.guild.id, userId);
+        await updateEloTable(client, interaction.guild.id);
+  
+        resultados.push(`El Elo de **<@${userId}>** fue **__establecido a 0__** y se le asignó el rango correspondiente.`);
+      } catch (error) {
+        console.error(`Error al actualizar el rango del usuario <@${userId}>:`, error);
+        errores.push(`Error al actualizar el rango de <@${userId}>.`);
       }
     }
 
-    // Responde con el rango y elo del usuario
+
+    let respuestaFinal = "";
+    if (resultados.length > 0) {
+      respuestaFinal += resultados.join("\n") + "\n";
+    }
+    if (errores.length > 0) {
+      respuestaFinal += `\n${errores.join("\n")}`;
+    }
+
     const e = new EmbedBuilder()
-      .setColor(client.constants.colorSucess)
-      .setDescription(
-        `El rango de **${usuario.tag}** es **[${rangoSymbol}]** con **${userElo}** de Elo.`
-      );
+      .setColor(resultados.length > 0 ? client.constants.colorSucess : client.constants.colorError)
+      .setDescription(respuestaFinal);
     return interaction.reply({ embeds: [e], allowedMentions: { repliedUser: false } });
   },
 });
