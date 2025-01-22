@@ -23,22 +23,22 @@ async function updateEloTable(client, guildId) {
 
     usuarios.sort((a, b) => b.elo - a.elo);
 
-    let top25 = usuarios.slice(0, 25);
+    let top30 = usuarios.slice(0, 30);
 
-    if (top25.length === 0) {
-      let mensaje = `**Top 25 de Elo**\n\nAún no hay jugadores para mostrar.`;
+    if (top30.length === 0) {
+      let mensaje = `**Top 50 de Elo**\n\nAún no hay jugadores para mostrar.`;
       return await eloMessage.edit({ content: mensaje });
     }
 
-    let ranking = top25
+    let ranking = top30
       .map((user, index) => {
         let usuario = eloMessage.guild.members.cache.get(user.user_id);
         let username = usuario ? usuario.user.tag : "Usuario no encontrado";
-        return `**${index + 1})** ${username} (<@${user.user_id}>): **\`${user.elo}\` Puntos.**`;
+        return `**${index + 1})** ${user.username} (<@${user.user_id}>): **\`${user.elo}\` Puntos.**`;
       })
       .join("\n");
 
-    let mensaje = `**Ranking de los TOP 25 jugadores con más Elo.**\n\n${ranking}`;
+    let mensaje = `**TOP 30 ELO PLAYERS**\n\n${ranking}`;
     await eloMessage.edit({ content: mensaje });
 
   } catch (error) {
