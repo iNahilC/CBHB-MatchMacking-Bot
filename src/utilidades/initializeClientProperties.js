@@ -7,17 +7,17 @@ function initializeClientProperties(client) {
     client.servidor_test = "656754930652151808";
 
     client.elo ={ 
-      permissionRol: "1327694586893832211",
-      channel: "1327694588814823459",
-      message: "1327753713749852203",
+      permissionRol: "1311860253696065717",
+      channel: "1331414581779890308",
+      message: "1331415463447494757",
       ranks: {
-        rango6: "1327694586893832207", // Rango 6
-        rango5: "1327694586893832206", // Rango 5
-        rango4: "1327694586893832205", // Rango 4
-        rango3: "1327694586893832204", // Rango 3
-        rango2: "1327694586893832203", // Rango 2
-        rango1: "1327694586893832202", // Rango 1
-        rango0: "1327694586864341119" // Rango 0
+        rango6: "1318648000779780096", // Rango 6
+        rango5: "1318647994702368788", // Rango 5
+        rango4: "1318647992286449725", // Rango 4
+        rango3: "1311862776259416124", // Rango 3
+        rango2: "1311862590779031664", // Rango 2
+        rango1: "1311862422658613268", // Rango 1
+        rango0: "1311863014818844743" // Rango 0
       }
     }
   
@@ -28,6 +28,12 @@ function initializeClientProperties(client) {
     };
   
     client.emojisId = {
+      leftfull: "<:LF:1330319013913563266>",
+      middlefull: "<:MF:1330319015863783484>",
+      rightfull: "<:RF:1330319011673538713>",
+      leftempty: "<:LE:1330319012948607047>",
+      middleempty: "<:ME:1330319014886641694>",
+      rightempty: "<:RE:1330319017289715722>",
       error: "<a:731642369396441100:760122074743570433>",
       success: "<a:checkgif:753779965933387888>",
       bot: "<:741688366663336067:760122067978420234>",

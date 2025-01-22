@@ -1,5 +1,4 @@
 const { SlashCommand, EmbedBuilder, ComponentType } = require("../../ConfigBot/index.js");
-const { updateEloTable } = require("../../Utilidades/updateEloTable.js");
 const { table } = require("table");
 const { createPaginationButtons } = require("../../Utilidades/createPaginationButtons.js");
 
@@ -12,7 +11,7 @@ module.exports = new SlashCommand({
     {
       name: "pagina",
       description: "Página de la tabla que deseas ver",
-      type: 4, // Integer
+      type: 4,
       required: false,
     },
   ],
@@ -32,11 +31,11 @@ module.exports = new SlashCommand({
     const top25 = eloData
       .filter(
         (entry) =>
-          interaction.guild.members.cache.has(entry.user_id) && // Obtener solamente a los usuarios que estan en el servidor. 
+          interaction.guild.members.cache.has(entry.user_id) && // Obtener solamente a los usuarios que están en el servidor. 
           entry.elo > 0 // Filtrar jugadores con Elo mayor a 0
-      )
-      .sort((a, b) => b.elo - a.elo)
-      .slice(0, 25);
+      ).sort((a, b) => b.elo - a.elo);
+    const totalElo = top25.reduce((sum, user) => sum + user.elo, 0);
+
 
     if (!top25.length) {
       const e = new EmbedBuilder()
@@ -45,9 +44,7 @@ module.exports = new SlashCommand({
       return interaction.reply({ embeds: [e], flags: 64 });
     }
 
-    await updateEloTable(client, interaction.guild.id);
-
-    const usuariosPorPagina = 5;
+    const usuariosPorPagina = 15;
     const paginasTotal = Math.ceil(top25.length / usuariosPorPagina);
 
     let paginaActual = interaction.options.getInteger("pagina") || 1;
@@ -61,8 +58,8 @@ module.exports = new SlashCommand({
       const data = [
         ["TOP", "USUARIO", "ELO"],
         ...usuarios.map((user, index) => {
-          const member = interaction.guild.members.cache.get(user.user_id);
-          return [`#${start + index + 1}`, member.user.tag, user.elo.toLocaleString()];
+          const username = user.username; // Nombre sin prefijos, guardado en la base de datos
+          return [`#${start + index + 1}`, username, user.elo.toLocaleString()];
         }),
       ];
 
@@ -77,7 +74,13 @@ module.exports = new SlashCommand({
 
       return new EmbedBuilder()
         .setColor(client.constants.colorSucess)
-        .setDescription(`\`\`\`\n${tabla}\n\`\`\``)
+        .setDescription(`
+Mostrando **${top25.length}** jugadores con un total de **${totalElo.toLocaleString()}** de **elo**!
+
+\`\`\`
+${tabla}
+\`\`\`
+`)
         .setFooter({ text: `Página ${pagina + 1} de ${paginasTotal}` })
         .setTimestamp();
     };

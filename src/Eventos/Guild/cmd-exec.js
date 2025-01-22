@@ -15,17 +15,15 @@ module.exports = new Evento({
     let comando = client.slashcommands.get(interaction.commandName);
     if (client.tiene_slashcommand(comando.name)) {
       let command_info = client.obtener_slashcommand(comando.name)
-//   if (interaction.user.id !== client.constants.ownerId) return interaction.reply({
-//     content: `${client.emojisId.off} Hola **${interaction.user.tag}**, Estoy en un mantinimento general por ahora, **__no__** puedes utilizar mis **__comandos__**.`,
-//   });
-      if (command_info.hasOwnProperty("disponible") && command_info.disponible === emojiError) return interaction.reply({
+      if (command_info.hasOwnProperty("disponible") && command_info.disponible === client.emojisId.error) return interaction.reply({
         content: `${client.emojisId.off} El comando **__${comando.name}__** se encuentra en mantenimiento!`,
-        allowedMentions: { repliedUser: emojiError },
+        allowedMentions: { repliedUser: false },
         flags: 64
       });
+
       if (command_info.hasOwnProperty("only_owner") && command_info.only_owner === true && interaction.user.id !== client.constants.ownerId) return interaction.reply({
         content: `${client.emojisId.warning} El comando **__${comando.name}__** solo lo puede ejecutar mi creador!`,
-        allowedMentions: { repliedUser: emojiError }, 
+        allowedMentions: { repliedUser: false }, 
         flags: 64
       });
 

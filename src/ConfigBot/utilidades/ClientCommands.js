@@ -1,6 +1,6 @@
 const { readdirSync, lstatSync, existsSync } = require("fs"), 
       { resolve } = require("path"), 
-      { Console } = require("../utilidades/ClientConsole"),
+      { Console } = require("./ClientConsole"),
       ClientError = require("../clases/ClientError");
 
 

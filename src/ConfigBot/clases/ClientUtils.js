@@ -40,7 +40,7 @@ let permisos_object = {
 class DiscordUtils {
   constructor() {}
 
-  parse_tiempo(ms, formato, len = emojiError) {
+  parse_tiempo(ms, formato, len = false) {
     if (isNaN(ms)) throw new ClientError("METODO_ERROR", "El metodo parse_tiempo recibe 3 parametros (el primero un numero, el segundo un formato del texto y el tercero el lenguaje: en-es)")
     if (!formato) throw new ClientError("METODO_ERROR", "El valor del segundo parametro del metodo parse_tiempo debe ser un string, recuerda usar {{tiempo}} en el lugar donde quieres que se muestre el tiempo.")
     if (!len) len = "es"
@@ -108,14 +108,14 @@ class DiscordUtils {
   }
 
 
-  obtener_rol(message, nombre_id = emojiError) {
+  obtener_rol(message, nombre_id = false) {
     if (!message) throw new ClientError("METODO_ERROR", "El metodo obtener_rol recibe 1 parametro obligatorio (el mensaje(message))")
     if (!message.mentions || !message.guild) return null
     return message.mentions.roles.first() || message.guild.roles.get(nombre_id) || message.guild.roles.find(r => r.name == nombre_id)
   }
 
 
-  obtener_miembro(message, nombre_id = emojiError, global_user = emojiError) {
+  obtener_miembro(message, nombre_id = false, global_user = false) {
     if (!message) throw new ClientError("METODO_ERROR", "El metodo obtener_miembro recibe 1 parametro obligatorio (el mensaje(message))")
     if (!message.mentions || !message.guild || !message.client) return null
     if (!global_user) return message.mentions.members.first() || message.guild.members.cache.get(nombre_id) || message.guild.members.cache.find(u => u.user.username == nombre_id)
@@ -123,7 +123,7 @@ class DiscordUtils {
   }
 
 
-  obtener_emoji(message, nombre_id = emojiError, global_emoji = emojiError) {
+  obtener_emoji(message, nombre_id = false, global_emoji = false) {
     if (!message) throw new ClientError("METODO_ERROR", "El metodo obtener_emoji recibe 1 parametro obligatorio (el mensaje(message))")
     if (!message.guild || !message.client) return null
     if (!global_emoji) return message.guild.emojis.cache.get(nombre_id) || message.guild.emojis.cache.find(e => e.name == nombre_id)
@@ -131,14 +131,14 @@ class DiscordUtils {
   }
 
 
-  obtener_canal(message, nombre_id = emojiError, global_channel = emojiError) {
+  obtener_canal(message, nombre_id = false, global_channel = false) {
     if (!message) throw new ClientError("METODO_ERROR", "El metodo obtener_canal recibe 1 parametro obligatorio (el mensaje(message))")
     if (!message.mentions || !message.guild || !message.client) return null
     if (!global_channel) return message.mentions.channels.first() || message.guild.channels.cache.get(nombre_id) || message.guild.channels.cache.find(c => c.name == nombre_id)
     return message.mentions.channels.first() || message.client.channels.cache.get(nombre_id) || message.client.channels.cache.find(c => c.name == nombre_id)
   }
 
-  permisos(permisos, member, len = emojiError) {
+  permisos(permisos, member, len = false) {
     if (!permisos) throw new ClientError("METODO_ERROR", "El metodo permisos recibe 3 parametros (un array de permisos, el GuildMember y el lenguaje: en-es <opcional>)")
     if (!Array.isArray(permisos)) throw new ClientError("METODO_ERROR", "El primer parametro del metodo permisos debe contener un array con los permisos a verificar")
     if (!member.permissions) throw new ClientError("METODO_ERROR", "El segundo parametro del metodo permisos debe ser un GuildMember.")
@@ -153,14 +153,14 @@ class DiscordUtils {
   esObject(type_var) {
     if (!type_var && type_var != 0) throw new ClientError("METODO_ERROR", "El metodo esObject recibe 1 parametro (un valor a verificar)")
     if (typeof type_var == "object" && !(type_var instanceof Array)) return true
-    return emojiError
+    return false
   }
 
 
   esArray(type_var) {
     if (!type_var && type_var != 0) throw new ClientError("METODO_ERROR", "El metodo esArray recibe 1 parametro (un valor a verificar)")
     if (Array.isArray(type_var)) return true
-    return emojiError
+    return false
   }
 
 
@@ -172,7 +172,7 @@ class DiscordUtils {
 
   esNum(type_var) {
     if (!type_var && type_var != 0) throw new ClientError("METODO_ERROR", "El metodo esNum recibe 1 parametro (un valor a verificar)")
-    return !!parseInt(type_var) == emojiError && parseInt(type_var) != 0 ? emojiError : true
+    return !!parseInt(type_var) == false && parseInt(type_var) != 0 ? false : true
   }
 
 
@@ -202,7 +202,7 @@ class DiscordUtils {
     if (!symbol || typeof symbol != "string") throw new ClientError("METODO_ERROR", "El metodo math recibe 2 parametros (el primero el simbolo: *-/+ y luego uno o mas parametros con los numeros que se evaluaran en la operacion.")
     if (!["*", "/", "-", "+"].includes(symbol)) throw new ClientError("METODO_ERROR", "El simbolo que se usa en el metodo math deben ser los siguientes: *-+/")
     if (args.length < 2) throw new ClientError("METODO_ERROR", "El metodo math necesita recibir uno o mas parametros con los numeros que se evaluaran en la operacion especificada.")
-    if (args.some(n => !!parseInt(n) == emojiError && parseInt(n) != 0)) throw new ClientError("METODO_ERROR", "Un parametro del metodo math no es un numero.")
+    if (args.some(n => !!parseInt(n) == false && parseInt(n) != 0)) throw new ClientError("METODO_ERROR", "Un parametro del metodo math no es un numero.")
     let result = this.esFloat(args[0]) ? parseFloat(args[0]) : parseInt(args[0])
     for (var number of args.slice(1)) {
       number = this.esFloat(number) ? parseFloat(number) : parseInt(number)
@@ -225,7 +225,7 @@ class DiscordUtils {
       x,
       size;
     for (x = 0, size = array.length; x < size; x++) {
-      if (obj[array[x]]) return emojiError
+      if (obj[array[x]]) return false
       obj[array[x]] = true
     }
     return true
@@ -331,9 +331,9 @@ class DiscordUtils {
     let format = date.slice(-1),
       time = date.slice(0, -1)
 
-    if (!valid_keys[format]) return emojiError
-    if (isNaN(time)) return emojiError
-    if (parseInt(time) <= 0) return emojiError
+    if (!valid_keys[format]) return false
+    if (isNaN(time)) return false
+    if (parseInt(time) <= 0) return false
     return {
       nombre: `${parseInt(time)} ${valid_keys[format].nombre}`,
       tiempo: valid_keys[format].tiempo * parseInt(time)

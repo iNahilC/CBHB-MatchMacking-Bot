@@ -23,9 +23,9 @@ const { Client, Collection } = require("discord.js"), { Console } = require("../
 
 class ConfigBot extends Client {
     constructor(options = {}) {
-        if (options.hasOwnProperty("comandos") && typeof options.comandos !== "string" && options.comandos !== emojiError) throw new ClientError("COMANDO_ERROR", "Necesitar colocar una rota para los comandos.")
+        if (options.hasOwnProperty("comandos") && typeof options.comandos !== "string" && options.comandos !== false) throw new ClientError("COMANDO_ERROR", "Necesitar colocar una rota para los comandos.")
         // if (!options.hasOwnProperty("token") || typeof options.token != "string") throw new ClientError("TOKEN_ERROR", "Token invalido, necesitas colocar el token del bot.")
-        if (!options.hasOwnProperty("slashcommands") || typeof options.slashcommands !== "string" && options.slashcommands !== emojiError) throw new ClientError("SLASHCOMANDO_ERROR", "Necesitas colocar la ruta de la carpeta donde estan tus slash-commands, puedes colocar emojiError en caso de que no contengas ningun slash-command.")
+        if (!options.hasOwnProperty("slashcommands") || typeof options.slashcommands !== "string" && options.slashcommands !== false) throw new ClientError("SLASHCOMANDO_ERROR", "Necesitas colocar la ruta de la carpeta donde estan tus slash-commands, puedes colocar false en caso de que no contengas ningun slash-command.")
         if (!options.hasOwnProperty("eventos") || typeof options.eventos != "string") throw new ClientError("EVENTO_ERROR", "Necesitas colocar la ruta de la carpeta donde estan tus eventos, esto es obligatorio.")
         if (options.hasOwnProperty("partials") && !Array.isArray(options.partials)) throw new ClientError("EVENTO_ERROR", "La propiedad partials debe ser un array.")
 
@@ -60,19 +60,19 @@ class ConfigBot extends Client {
         this.comandos = Commands_guild
         this.tiene_comando = (nombre) => {
           if(tiene_comando(nombre, this, true)) return true
-          return emojiError
+          return false
         }
 
-        this.obtener_comando = (nombre = emojiError) => {
+        this.obtener_comando = (nombre = false) => {
           if(obtener_comando(nombre, this)) return obtener_comando(nombre, this)
           return undefined
         }
 
-        this.ejecutar_comando = (nombre = emojiError, ...args) => {
+        this.ejecutar_comando = (nombre = false, ...args) => {
           ejecutar_comando(nombre, this, ...args)
         }
 
-        this.recargar_comando = (nombre = emojiError) => {
+        this.recargar_comando = (nombre = false) => {
           return recargar_comando(nombre, this)
         }
 
@@ -84,23 +84,23 @@ class ConfigBot extends Client {
         this.slashcommands = SlashCommands_guild
         this.tiene_slashcommand = (name) => {
             if (tiene_slashcommand(name, this, true)) return true
-            return emojiError
+            return false
         }
 
-        this.obtener_slashcommand = (name = emojiError) => {
+        this.obtener_slashcommand = (name = false) => {
             if (obtener_slashcommand(name, this)) return obtener_slashcommand(name, this)
             return undefined
         }
 
-        this.ejecutar_slashcommand = (name = emojiError, ...interaction) => {
+        this.ejecutar_slashcommand = (name = false, ...interaction) => {
             ejecutar_slashcommand(name, this, ...interaction)
         }
 
-        this.recargar_slashcommand = (name = emojiError) => {
+        this.recargar_slashcommand = (name = false) => {
             return recargar_slashcommand(name, this)
         }
 
-        this.add_slashcommand = (nombre, owner = emojiError) => {
+        this.add_slashcommand = (nombre, owner = false) => {
             return add_slashcommand(nombre, this, owner)
         }
 

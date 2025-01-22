@@ -7,7 +7,6 @@ module.exports = new Evento({
   ejecutar: async (client) => {
     try {
       let canalElo = client.channels.cache.get(client.elo.channel);
-      console.log(await client.db.get(`${canalElo.guild.id}.elo`));
       if (!canalElo) {
         console.error("[BOT] No pude encontrar el canal.");
         return;

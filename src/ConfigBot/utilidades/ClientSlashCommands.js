@@ -1,6 +1,6 @@
 const { readdirSync, lstatSync, existsSync } = require("fs"), 
       { resolve } = require("path"), 
-      { Console } = require("../utilidades/ClientConsole"),
+      { Console } = require("./ClientConsole"),
       ClientError = require("../clases/ClientError");
 
 
@@ -40,8 +40,8 @@ function cargar_slashcommand(carpeta_slash_command, collection) {
 
 }
 
-function tiene_slashcommand(name, client, alias = emojiError) {
-  if (!name) return emojiError
+function tiene_slashcommand(name, client, alias = false) {
+  if (!name) return false
   if (client.slashcommands.has(name)) return true
   if (alias) {
     if (client.slashcommands.find(comando => {
@@ -50,30 +50,30 @@ function tiene_slashcommand(name, client, alias = emojiError) {
         }
       })) return true
   }
-  return emojiError
+  return false
 }
 
-function obtener_slashcommand(name = emojiError, client) {
+function obtener_slashcommand(name = false, client) {
   if (!client || !client.slashcommands) throw new ClientError("METODO_ERROR", "El metodo obtener_slashcommand recibe 1 parametro obligatorio (el cliente(client))")
   if (!name) return client.slashcommands.keyArray()
-  if (!tiene_slashcommand(name, client, true)) return emojiError
+  if (!tiene_slashcommand(name, client, true)) return false
   return client.slashcommands.get(name) || client.slashcommands.find(cmd => cmd.alias.includes(name))
 }
 
 
 function ejecutar_slashcommand(name, client, ...interaction) {
   if (!name) throw new ClientError("METODO_ERROR", "El metodo ejecutar_slashcommand recibe 1 parametro obligatorio (el name del comando a ejecutar)")
-  if (!tiene_slashcommand(name, client, true)) return emojiError
+  if (!tiene_slashcommand(name, client, true)) return false
   let comando = obtener_slashcommand(name, client)
-  if (comando.hasOwnProperty("only_owner") && comando.only_owner === emojiError) return
-  if (comando.hasOwnProperty("disponible") && comando.disponible === emojiError) return
+  if (comando.hasOwnProperty("only_owner") && comando.only_owner === false) return
+  if (comando.hasOwnProperty("disponible") && comando.disponible === false) return
   comando.ejecutar(...interaction)
   return
 }
 
 function add_slashcommand(name, client, owner) {
   if (!name) throw new ClientError("METODO_ERROR", "El metodo add_slashcommand recibe 1 parametro obligatorio (el name del comando a ejecutar)")
-  if (!tiene_slashcommand(name, client, true)) return emojiError;
+  if (!tiene_slashcommand(name, client, true)) return false;
   let comando = obtener_slashcommand(name, client)
   
   if (owner) return client.guilds.cache.get(client.servidor_test).commands.create(comando);
@@ -98,7 +98,7 @@ function recargar_slashcommand(name, client) {
     return true
   }
 
-  if (!tiene_slashcommand(name, client, emojiError)) return emojiError
+  if (!tiene_slashcommand(name, client, false)) return false
   let { path } = obtener_slashcommand(name, client)
   delete require.cache[require.resolve(client.slashcommands.get(name).path)]
   client.slashcommands.delete(name)

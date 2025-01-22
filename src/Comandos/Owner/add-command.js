@@ -16,19 +16,19 @@ module.exports = new SlashCommand({
             try {
                 client.add_slashcommand(interaction.options.getString("comando"), true);
                 return interaction.reply({
-                    content: `${client.emojisId.success} Se ha agregado el comando **${interaction.options.getString("comando")}** a los servidores de testing.`, allowedMentions: { repliedUser: emojiError } });
+                    content: `${client.emojisId.success} Se ha agregado el comando **${interaction.options.getString("comando")}** a los servidores de testing.`, allowedMentions: { repliedUser: false } });
             } catch (e) {
                 return interaction.reply({
-                    content: `${client.emojisId.error} No se pudo agregar el comando **${interaction.options.getString("comando")}** a los servidores de testing.`, allowedMentions: { repliedUser: emojiError } });
+                    content: `${client.emojisId.error} No se pudo agregar el comando **${interaction.options.getString("comando")}** a los servidores de testing.`, allowedMentions: { repliedUser: false } });
                 }
     }  else {
         try {
-            client.add_slashcommand(interaction.options.getString("comando"), emojiError);
+            client.add_slashcommand(interaction.options.getString("comando"), false);
             return interaction.reply({
-                content: `${client.emojisId.success} Se ha agregado el comando **${interaction.options.getString("comando")}** a los servidores.`, allowedMentions: { repliedUser: emojiError } });
+                content: `${client.emojisId.success} Se ha agregado el comando **${interaction.options.getString("comando")}** a los servidores.`, allowedMentions: { repliedUser: false } });
         } catch (e) {
             return interaction.reply({
-                content: `${client.emojisId.error} No se pudo agregar el comando **${interaction.options.getString("comando")}** a los servidores.`, allowedMentions: { repliedUser: emojiError } });
+                content: `${client.emojisId.error} No se pudo agregar el comando **${interaction.options.getString("comando")}** a los servidores.`, allowedMentions: { repliedUser: false } });
             }
         }
     }

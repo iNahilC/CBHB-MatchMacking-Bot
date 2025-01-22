@@ -60,7 +60,6 @@ async function updateUserRankRole(client, guildId, userId) {
 
     try {
         let nuevoNombre = usuario.displayName;
-        console.log(nuevoNombre);
 
         nuevoNombre = nuevoNombre.replace(/\[[^\]]*\]/g, '').trim(); // RegEx bello para remover los prefijos de los y evitar que se repiten.
 
@@ -68,10 +67,10 @@ async function updateUserRankRole(client, guildId, userId) {
         nuevoNombre = `[${rangoSymbol}] ${nuevoNombre}`;
 
         await usuario.setNickname(nuevoNombre).catch(() => {
-            console.log(`No se pudo cambiar el nombre del usuario ${userId}:`);
+            console.log(`No se pudo cambiar el nombre del usuario ${client.users.cache.get(userId).displayName}:`);
         });
     } catch (error) {
-        console.error(`Error al cambiar el nombre del usuario ${userId}:`, error);
+        console.error(`Error al cambiar el nombre del usuario ${client.users.cache.get(userId).displayName}:`, error);
     }
 
     return {
@@ -126,6 +125,5 @@ async function getRank(client, guildId, userId) {
     if (elo >= 50) return 1;
     return 0;
 }
-
 
 module.exports = { updateUserRankRole, removeUserRankRole, getRank };

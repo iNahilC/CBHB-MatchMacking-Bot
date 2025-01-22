@@ -18,30 +18,30 @@ module.exports = new SlashCommand({
             await client.recargar_evento();
 
             return interaction.reply({
-                content: `${client.emojisId.success} Se han recargado todos los **comandos** y **eventos**.`, allowedMentions: { repliedUser: emojiError } });
+                content: `${client.emojisId.success} Se han recargado todos los **comandos** y **eventos**.`, allowedMentions: { repliedUser: false } });
           } catch (e) {
               console.error(e)
             return interaction.reply({
-                content: `${client.emojisId.error} No se pudo recargar los **comandos** y **eventos**.`, allowedMentions: { repliedUser: emojiError } });
+                content: `${client.emojisId.error} No se pudo recargar los **comandos** y **eventos**.`, allowedMentions: { repliedUser: false } });
             }
         } else {
             if (interaction.options.getString("comando")) {
                 try {
                     client.recargar_slashcommand(interaction.options.getString("comando"));
                     return interaction.reply({
-                        content: `${client.emojisId.success} Se ha recargado el comando **${interaction.options.getString("comando")}**.`, allowedMentions: { repliedUser: emojiError } });
+                        content: `${client.emojisId.success} Se ha recargado el comando **${interaction.options.getString("comando")}**.`, allowedMentions: { repliedUser: false } });
                 } catch (e) {
                     return interaction.reply({
-                        content: `${client.emojisId.error} No se pudo recargar el comando **${interaction.options.getString("comando")}**.`, allowedMentions: { repliedUser: emojiError } });
+                        content: `${client.emojisId.error} No se pudo recargar el comando **${interaction.options.getString("comando")}**.`, allowedMentions: { repliedUser: false } });
                 }
             } else {
                 try {
                     client.recargar_evento(interaction.options.getString("evento"));
                     return interaction.reply({
-                        content: `${client.emojisId.success} Se ha recargado el evento **${interaction.options.getString("evento")}**.`, allowedMentions: { repliedUser: emojiError } });
+                        content: `${client.emojisId.success} Se ha recargado el evento **${interaction.options.getString("evento")}**.`, allowedMentions: { repliedUser: false } });
                 } catch (e) {
                     return interaction.reply({
-                        content: `${client.emojisId.error} No se pudo recargar el evento **${interaction.options.getString("evento")}**.`, allowedMentions: { repliedUser: emojiError } });
+                        content: `${client.emojisId.error} No se pudo recargar el evento **${interaction.options.getString("evento")}**.`, allowedMentions: { repliedUser: false } });
                 }
             }
         }
