@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-binary-expression */
 const ClientError = require("./ClientError.js");
 const { MessageActionRow, MessageButton } = require("discord.js");
 
@@ -350,7 +351,7 @@ class DiscordUtils {
   }
 
 
-  createButton(label, disabled, length) {
+  createButton(label, disabled,) {
     let style = 'SECONDARY';
     if (label === 'AC' || label === 'DC' || label === '⌫') {
       style = 'DANGER';

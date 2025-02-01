@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 /*///////////////////////////////////////////////////////////*/
 // ╔════════════════════════════════════════════════════════╗//
 // ║                                                        ║//
@@ -18,7 +19,8 @@ const { Client, Collection } = require("discord.js"), { Console } = require("../
       ClientError = require("./ClientError.js"),
       Commands_guild = new Collection(),
       SlashCommands_guild = new Collection(),
-      Cooldown = new Map();
+      { QuickDB } = require('quick.db');
+
 
 
 class ConfigBot extends Client {
@@ -35,6 +37,7 @@ class ConfigBot extends Client {
         this.path_eventos = options.eventos
         this.path_comandos = options.comandos
         this.path_slashcommands = options.slashcommands
+        this.db = new QuickDB(),
         this.login()
     }
 

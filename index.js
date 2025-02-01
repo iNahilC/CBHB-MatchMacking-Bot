@@ -1,5 +1,7 @@
-const { ConfigBot, GatewayIntentBits  } = require("./src/ConfigBot/index");
-const client = new ConfigBot({
+const { ConfigBot, GatewayIntentBits, Partials  } = require("./src/ConfigBot/index");
+// FTP exeo2HiFuxSXLds
+
+new ConfigBot({
 slashcommands: "./src/Comandos/",
 eventos: "./src/Eventos/",
     intents: [
@@ -16,8 +18,9 @@ eventos: "./src/Eventos/",
         GatewayIntentBits.DirectMessages,
         GatewayIntentBits.DirectMessageReactions,
         GatewayIntentBits.DirectMessageTyping,
+        GatewayIntentBits.MessageContent,
     ],
     ws: {
-    partials: ["MESSAGE", "CHANNEL", "REACTION"]
+    partials: [Partials.Message, Partials.Channel, Partials.Reaction]
     }
 });

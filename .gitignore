@@ -130,3 +130,4 @@ dist
 .pnp.*
 src/ConfigBot/clases/Client.js
 json.sqlite
+.prettierrc

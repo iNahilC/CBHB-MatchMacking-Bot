@@ -93,11 +93,13 @@ const {
   VoiceChannel,
   VoiceRegion,
   VoiceState,
+  VoiceStateUpdate,
   Webhook,
   WebSocket,
   Routes,
   REST,
   ComponentType,
+  Partials
 } = require('discord.js');
 
 module.exports = {
@@ -189,7 +191,9 @@ module.exports = {
   VoiceChannel,
   VoiceRegion,
   VoiceState,
+  VoiceStateUpdate,
   Webhook,
   WebSocket,
   ComponentType,
+  Partials
 };

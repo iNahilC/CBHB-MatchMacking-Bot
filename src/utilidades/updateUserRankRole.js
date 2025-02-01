@@ -1,19 +1,21 @@
-async function updateUserRankRole(client, guildId, userId) {
+async function updateUserRankRole(client, guildId, userId, eloData) {
     const RANGOS = [
-        { eloMinimo: 1800, eloMaximo: 2300, roleId: client.elo.ranks.rango6, rango: "⑥" }, // Rango 6
-        { eloMinimo: 1300, eloMaximo: 1799, roleId: client.elo.ranks.rango5, rango: "⑤" }, // Rango 5
-        { eloMinimo: 1000, eloMaximo: 1299, roleId: client.elo.ranks.rango4, rango: "④" }, // Rango 4
-        { eloMinimo: 500, eloMaximo: 999, roleId: client.elo.ranks.rango3, rango: "③" },   // Rango 3
-        { eloMinimo: 300, eloMaximo: 499, roleId: client.elo.ranks.rango2, rango: "②" },   // Rango 2
-        { eloMinimo: 50, eloMaximo: 299, roleId: client.elo.ranks.rango1, rango: "①" },    // Rango 1
-        { eloMinimo: 0, eloMaximo: 49, roleId: client.elo.ranks.rango0, rango: "⓪" }       // Rango 0
+        // Modificado el último rango para usar Infinity
+        { eloMinimo: 1800, eloMaximo: Infinity, roleId: client.elo.ranks.rango6, rango: '⑥' },
+        { eloMinimo: 1300, eloMaximo: 1799, roleId: client.elo.ranks.rango5, rango: '⑤' },
+        { eloMinimo: 1000, eloMaximo: 1299, roleId: client.elo.ranks.rango4, rango: '④' },
+        { eloMinimo: 500, eloMaximo: 999, roleId: client.elo.ranks.rango3, rango: '③' },
+        { eloMinimo: 300, eloMaximo: 499, roleId: client.elo.ranks.rango2, rango: '②' },
+        { eloMinimo: 50, eloMaximo: 299, roleId: client.elo.ranks.rango1, rango: '①' },
+        { eloMinimo: 0, eloMaximo: 49, roleId: client.elo.ranks.rango0, rango: '⓪' },
     ];
 
     const guild = client.guilds.cache.get(guildId);
     if (!guild) return null;
 
-    const elo = await client.db.get(`${guildId}.elo`);
-    const entradaUsuarioElo = elo.find((entry) => entry.user_id === userId);
+    const entradaUsuarioElo = eloData 
+        ? eloData.find(entry => entry.user_id === userId)
+        : (await client.db.get(`${guildId}.elo`) || []).find(entry => entry.user_id === userId);
 
     if (!entradaUsuarioElo) return null;
 
@@ -22,108 +24,93 @@ async function updateUserRankRole(client, guildId, userId) {
 
     const userElo = entradaUsuarioElo.elo;
 
-    let rangoActual = null;
-    let nuevoRango = null;
-    let rangoSymbol = "";
+    const rangoActual = RANGOS.find(r => usuario.roles.cache.has(r.roleId))?.roleId;
 
-    for (const rango of RANGOS) {
-        if (usuario.roles.cache.has(rango.roleId)) {
-            rangoActual = rango.roleId;
-            break;
-        }
-    }
+    const nuevoRangoObj = RANGOS.find(r => userElo >= r.eloMinimo && userElo <= r.eloMaximo);
+    
+    if (!nuevoRangoObj) return null;
 
-    for (const rango of RANGOS) {
-        if (userElo >= rango.eloMinimo && userElo <= rango.eloMaximo) {
-            nuevoRango = rango.roleId;
-            rangoSymbol = rango.rango;
-            break;
-        }
-    }
+    const { roleId: nuevoRango, rango: rangoSymbol } = nuevoRangoObj;
 
-    if (!nuevoRango) return null;
+    const rolesParaRemover = RANGOS
+        .filter(r => r.roleId !== nuevoRango)
+        .map(r => r.roleId);
 
-    const rolesAñadidos = [];
-    const rolesRemovidos = [];
+    const cambios = {
+        añadidos: [],
+        removidos: []
+    };
 
-    for (const rango of RANGOS) {
-        if (rango.roleId !== nuevoRango && usuario.roles.cache.has(rango.roleId)) {
-            await usuario.roles.remove(rango.roleId).catch(() => null);
-            rolesRemovidos.push(rango.roleId);
+    for (const roleId of rolesParaRemover) {
+        if (usuario.roles.cache.has(roleId)) {
+            await usuario.roles.remove(roleId).catch(() => null);
+            cambios.removidos.push(roleId);
         }
     }
 
     if (!usuario.roles.cache.has(nuevoRango)) {
         await usuario.roles.add(nuevoRango).catch(() => null);
-        rolesAñadidos.push(nuevoRango);
+        cambios.añadidos.push(nuevoRango);
     }
 
     try {
-        let nuevoNombre = usuario.displayName;
-
-        nuevoNombre = nuevoNombre.replace(/\[[^\]]*\]/g, '').trim(); // RegEx bello para remover los prefijos de los y evitar que se repiten.
-
-        // Agregar el nuevo prefijo de rango
-        nuevoNombre = `[${rangoSymbol}] ${nuevoNombre}`;
-
-        await usuario.setNickname(nuevoNombre).catch(() => {
-            console.log(`No se pudo cambiar el nombre del usuario ${client.users.cache.get(userId).displayName}:`);
-        });
+        const nuevoNombre = `[${rangoSymbol}] ${usuario.displayName.replace(/\[.*?\]\s*/g, '')}`;
+        await usuario.setNickname(nuevoNombre);
     } catch (error) {
-        console.error(`Error al cambiar el nombre del usuario ${client.users.cache.get(userId).displayName}:`, error);
+        console.error(`Error actualizando apodo de ${usuario.user.tag}:`, error);
     }
 
     return {
-        cambios: { añadidos: rolesAñadidos || [], removidos: rolesRemovidos || [] },
-        rangoActual: rangoActual,
-        nuevoRango: nuevoRango
+        cambios: cambios.añadidos.length > 0 || cambios.removidos.length > 0 ? cambios : null,
+        rangoActual,
+        nuevoRango
     };
 }
 
 async function removeUserRankRole(client, guildId, userId) {
-    const RANGOS = [
-        client.elo.ranks.rango1,
-        client.elo.ranks.rango2,
-        client.elo.ranks.rango3,
-        client.elo.ranks.rango4,
-        client.elo.ranks.rango5,
-        client.elo.ranks.rango6,
-        client.elo.ranks.rango7,
-    ];
+	const RANGOS = [
+		client.elo.ranks.rango1,
+		client.elo.ranks.rango2,
+		client.elo.ranks.rango3,
+		client.elo.ranks.rango4,
+		client.elo.ranks.rango5,
+		client.elo.ranks.rango6,
+		client.elo.ranks.rango7,
+	]
 
-    const guild = client.guilds.cache.get(guildId);
-    if (!guild) return;
+	const guild = client.guilds.cache.get(guildId)
+	if (!guild) return
 
-    const usuario = await guild.members.fetch(userId).catch(() => null);
-    if (!usuario) return;
+	const usuario = await guild.members.fetch(userId).catch(() => null)
+	if (!usuario) return
 
-    const rolesRemovidos = [];
+	const rolesRemovidos = []
 
-    for (const roleId of RANGOS) {
-        if (usuario.roles.cache.has(roleId)) {
-            await usuario.roles.remove(roleId).catch(() => null);
-            rolesRemovidos.push(roleId);
-        }
-    }
+	for (const roleId of RANGOS) {
+		if (usuario.roles.cache.has(roleId)) {
+			await usuario.roles.remove(roleId).catch(() => null)
+			rolesRemovidos.push(roleId)
+		}
+	}
 
-    return rolesRemovidos;
+	return rolesRemovidos
 }
 
 async function getRank(client, guildId, userId) {
-    const eloData = (await client.db.get(`${guildId}.elo`)) || [];
-    const usuarioElo = eloData.find((entry) => entry.user_id === userId);
-  
-    if (!usuarioElo) return 0;
-  
-    const { elo } = usuarioElo;
+	const eloData = (await client.db.get(`${guildId}.elo`)) || []
+	const usuarioElo = eloData.find((entry) => entry.user_id === userId)
 
-    if (elo >= 1800) return 6;
-    if (elo >= 1300) return 5;
-    if (elo >= 1000) return 4;
-    if (elo >= 500) return 3;
-    if (elo >= 300) return 2;
-    if (elo >= 50) return 1;
-    return 0;
+	if (!usuarioElo) return 0
+
+	const { elo } = usuarioElo
+
+	if (elo >= 1800) return 6
+	if (elo >= 1300) return 5
+	if (elo >= 1000) return 4
+	if (elo >= 500) return 3
+	if (elo >= 300) return 2
+	if (elo >= 50) return 1
+	return 0
 }
 
-module.exports = { updateUserRankRole, removeUserRankRole, getRank };
+module.exports = { updateUserRankRole, removeUserRankRole, getRank }
