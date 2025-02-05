@@ -15,7 +15,7 @@ module.exports = new Evento({
 			const idServidor = canalElo.guild.id;
 			await updateEloTable(client, idServidor);
 
-			const datosElo = (await client.db.get(`${idServidor}.elo`)) || [];
+			const datosElo = (await client.db.get(`${idServidor}.season2`)) || [];
 			let cambios = [];
 
 			for (const jugador of datosElo) {

@@ -1,55 +1,91 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder } = require('discord.js');
+const { getVoicePlayers } = require("../Utilidades/getVoicePlayers")
 
-async function actualizarMensajePartida(client, mensaje) {
-    if (!mensaje) return;
-    
-    const partidas = await client.db.get(`${mensaje.guild.id}.matchs`) || [];
-    const partida = partidas.find(p => p.messageId === mensaje.id);
-    if (!partida) return;
-
-    let estadoPartida = '';
-    if (partida.enCurso) {
-        estadoPartida = `${client.emojisId.game} **Partida en progreso**`;
-    } else if (partida.votacionIniciada) {
-        estadoPartida = `${client.emojisId.vote} **Votación de capitanes en curso**`;
-    } else {
-        estadoPartida = `${client.emojisId.waiting} **Esperando jugadores...**`;
-    }
-
-    // Obtener los jugadores para la sección "Jugadores Disponibles"
-    const jugadoresDisponibles = partida.jugadores.map((id, i) => {
-        const miembro = mensaje.guild.members.cache.get(id);
-        return `**${i + 1}) ${miembro.displayName}** (${miembro})`;
-    }).join('\n') || 'No hay jugadores disponibles aún.';
-
-    const embed = new EmbedBuilder()
-        .setTitle('🎮 Partida en Organización')
-        .setColor(client.colors.success)
-        .addFields(
-            { name: '🛡️ Host', value: `<@${partida.hostId}>`, inline: true },
-            { name: '👥 Jugadores', value: `${partida.jugadores.length}/10`, inline: true },
-            { name: '🏆 Jugadores Disponibles', value: jugadoresDisponibles }
-        )
-        .setDescription(`${estadoPartida}`)
-        .setFooter({ text: 'Estado de la partida' });
-
-    // Crear fila de botones
-    const botones = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId(`queue_leave_${partida.hostId}`)
-            .setLabel('Salir')
-            .setStyle(ButtonStyle.Danger),
-        new ButtonBuilder()
-            .setCustomId(`queue_start_votation_${partida.hostId}`)
-            .setLabel('Iniciar Votación de Capitanes')
-            .setStyle(ButtonStyle.Primary)
-            .setDisabled(partida.jugadores.length <= 9)
-    );
-
+async function actualizarMensajePartida(client, message) {
     try {
-        await mensaje.edit({ embeds: [embed], components: [botones] });
+        const partidas = await client.db.get(`${message.guild.id}.matchs`) || [];
+        const partida = partidas.find(p => p.messageId === message.id);
+        if (!partida) return;
+
+        const guild = await client.guilds.fetch(partida.guildId);
+        const jugadoresEnVoz = getVoicePlayers(guild).map(p => p.id);
+        const jugadoresTotales = [...new Set([...jugadoresEnVoz, ...partida.jugadores])];
+        const jugadoresActivos = jugadoresTotales.map(id => guild.members.cache.get(id)).filter(Boolean);
+
+        partida.jugadores = jugadoresTotales;
+        await client.db.set(`${message.guild.id}.matchs`, partidas);
+
+        // Ordenar jugadores por votos
+        const jugadoresOrdenados = jugadoresActivos
+            .filter(p => p.id !== partida.hostId)
+            .sort((a, b) => {
+                const votosA = partida.votos ? Object.values(partida.votos).filter(v => v === a.id).length : 0;
+                const votosB = partida.votos ? Object.values(partida.votos).filter(v => v === b.id).length : 0;
+                return votosB - votosA;
+            });
+
+        let listaJugadores = jugadoresOrdenados
+            .map((p, i) => {
+                const votos = partida.votos ? Object.values(partida.votos).filter(v => v === p.id).length : 0;
+                return `**${i + 1}) ${p.displayName}** (${p}) ${votos > 0 ? `- 🗳️ ${votos} voto(s)` : ''}`;
+            })
+            .join('\n') || 'No hay jugadores disponibles aún.';
+
+        const embed = new EmbedBuilder()
+            .setTitle('🎮 Partida en Organización')
+            .setColor(client.colors.success)
+            .addFields(
+                { 
+                    name: `${client.emojisId.crown} Capitanes`,
+                    value: partida.segundoCapitan 
+                        ? `• Host: <@${partida.hostId}>\n• Capitán: <@${partida.segundoCapitan}>` 
+                        : partida.votacionIniciada 
+                            ? `${client.emojisId.clock} Votación en progreso...`
+                            : 'No iniciada'
+                },
+                { 
+                    name: `${client.emojisId.users} Jugadores [${jugadoresActivos.length}/10]`,
+                    value: listaJugadores,
+                    inline: true 
+                }
+            );
+
+        const botones = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId(`queue_unirse_${partida.hostId}`)
+                .setLabel('Unirse')
+                .setStyle(ButtonStyle.Success)
+                .setEmoji(client.emojisId.join),
+            new ButtonBuilder()
+                .setCustomId(`queue_abandonar_${partida.hostId}`)
+                .setLabel('Abandonar')
+                .setStyle(ButtonStyle.Danger)
+                .setEmoji(client.emojisId.leave),
+            new ButtonBuilder()
+                .setCustomId(`queue_cancelar_${partida.hostId}`)
+                .setLabel('Cancelar')
+                .setStyle(ButtonStyle.Secondary)
+                .setEmoji(client.emojisId.cancel)
+        );
+
+        // Mostrar botón de votación solo si hay mínimo 2 jugadores y no hay capitán
+        if (jugadoresActivos.length >= 2 && !partida.segundoCapitan && !partida.votacionIniciada) {
+            botones.addComponents(
+                new ButtonBuilder()
+                    .setCustomId(`queue_start_votation_${partida.hostId}`)
+                    .setLabel('Iniciar Votación')
+                    .setStyle(ButtonStyle.Primary)
+                    .setEmoji(client.emojisId.vote)
+            );
+        }
+
+        await message.edit({ 
+            embeds: [embed], 
+            components: [botones] 
+        });
+
     } catch (error) {
-        console.error('Error al actualizar el mensaje de la partida:', error);
+        console.error('Error actualizando partida:', error);
     }
 }
 

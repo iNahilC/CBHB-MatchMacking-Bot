@@ -18,13 +18,13 @@ module.exports = new SlashCommand({
 		try {
 			await interaction.deferReply();
 
-			if (!client.db.has(`${interaction.guild.id}.elo`)) {
-				await client.db.set(`${interaction.guild.id}.elo`, [])
+			if (!client.db.has(`${interaction.guild.id}.season2`)) {
+				await client.db.set(`${interaction.guild.id}.season2`, [])
 			}
 
 			const usuario = interaction.options.getUser('usuario') || interaction.user
 
-			const elo = (await client.db.get(`${interaction.guild.id}.elo`)) || []
+			const elo = (await client.db.get(`${interaction.guild.id}.season2`)) || []
 			const usuarioElo = elo.find((entry) => entry.user_id === usuario.id)
 
 			if (!usuarioElo) {

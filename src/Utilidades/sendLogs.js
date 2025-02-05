@@ -1,4 +1,3 @@
-// const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { EmbedBuilder } = require('../ConfigBot');
 
 async function sendLogs(client, interaction, type, details = []) {
@@ -34,9 +33,12 @@ async function sendLogs(client, interaction, type, details = []) {
         return;
     }
 
-    const logMessages = [];
-    const eloData = await client.db.get(`${interaction.guild.id}.elo`);
+    // Recuperamos la data actual de elo de la base de datos
+    const eloData = await client.db.get(`${interaction.guild.id}.season2`);
     const actionUser = interaction.user.globalName;
+
+    // En lugar de almacenar solo strings, almacenaremos un objeto con el mensaje y los datos del footer.
+    const logEntries = [];
 
     for (const userDetails of details) {
         const { targetUser, eloAnterior, elo, componentId } = userDetails;
@@ -48,27 +50,31 @@ async function sendLogs(client, interaction, type, details = []) {
 
         switch (logTypeKey) {
             case 'agregar':
-                logMessage = `✅ **${actionUser}** agregó **${elo}** de **elo** al usuario **${member}**.\n\n**Elo actual:** \`${currentElo}\` | **Elo anterior:** \`${eloAnterior}\``;
+                logMessage = `✅ **${actionUser}** agregó **+${elo}** de **elo** al usuario **${member}**.`;
                 break;
-
             case 'establecer':
-                logMessage = `✅ **${actionUser}** estableció **${elo}** de **elo** al usuario **${member}**.\n\n**Elo actual:** \`${elo}\` | **Elo anterior:** \`${eloAnterior}\``;
+                logMessage = `✅ **${actionUser}** estableció **=${elo}** de **elo** al usuario **${member}**.`;
                 break;
-
             case 'remover':
-                logMessage = `✅ **${actionUser}** removió **${elo}** de **elo** al usuario **${member}**.\n\n**Elo actual:** \`${currentElo}\` | **Elo anterior:** \`${eloAnterior}\``;
+                logMessage = `✅ **${actionUser}** removió **-${elo}** de **elo** al usuario **${member}**.`;
                 break;
-
             case 'eliminar':
-                logMessage = `✅ **${actionUser}** **eliminó** el **ELO** del usuario **${member}**.\n\n**Elo anterior:** \`${eloAnterior}\``;
+                logMessage = `✅ **${actionUser}** eliminó el **ELO** del usuario **${member}**.`;
                 break;
-
             default:
                 logMessage = `**⚠️ Acción Desconocida**\n\n**Usuario:** ${interaction.user.tag}\n**Descripción:** ${userDetails.description || 'No especificada'}`;
                 break;
         }
 
-        logMessages.push(logMessage);
+        // Agregamos la información necesaria para el footer junto con el mensaje.
+        logEntries.push({
+            message: `${logMessage}`,
+            currentElo,
+            eloAnterior,
+            componentId,
+        });
+
+        // Registrar el componente (si no existe ya)
         const storedComponentsId = await client.db.get(`${interaction.guild.id}.activeComponents`) || [];
         if (!storedComponentsId.some(entry => entry.id === componentId)) {
             storedComponentsId.push({ id: componentId, type: logTypeKey, targetUser });
@@ -77,14 +83,14 @@ async function sendLogs(client, interaction, type, details = []) {
     }
 
     try {
-        for (let i = 0; i < logMessages.length; i++) {
+        // Enviar un embed por cada entrada en logEntries
+        for (const entry of logEntries) {
             const embed = new EmbedBuilder()
                 .setColor(client.colors.success)
-                .setDescription(logMessages[i]);
+                .setDescription(entry.message)
+                .setFooter({ text: `Elo Actual: ${entry.currentElo} | Elo Anterior: ${entry.eloAnterior}` });
 
-            await logChannel.send({
-                embeds: [embed],
-            });
+            await logChannel.send({ embeds: [embed] });
         }
     } catch (error) {
         console.error(`Error al enviar los logs al canal (${logTypeKey}): ${error.message}`);

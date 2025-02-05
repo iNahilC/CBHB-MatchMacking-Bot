@@ -20,7 +20,6 @@ function cargar_eventos(carpeta_eventos) {
         if(!evento.hasOwnProperty("nombre") || typeof evento.nombre != "string") throw new ClientError("EVENTO_ERROR", `El evento ${sub_archivo} no contiene la propiedad nombre, esto es obligatorio y debe ser un string.`)
         if(!evento.hasOwnProperty("ejecutar") || typeof evento.ejecutar != "function") throw new ClientError("EVENTO_ERROR", `El evento ${sub_archivo} no contiene la propiedad ejecutar, esto es obligatorio y deber ser una funcion.`)
         eventos.push(evento.nombre = {nombre: evento.nombre, ejecutar: evento.ejecutar})
-      console.log(evento.nombre)
         Console(["morado", "blanco", "amarillo"], `<0>[EVENTO]<1> El evento <2>${archivo}/${sub_archivo}<1> fue cargado correctamente.`)
       })
       return

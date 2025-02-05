@@ -8,9 +8,8 @@ module.exports = new Evento({
 		Console(['verde', 'blanco'], '<0>[BOT]<1> Listo.')
 		initializeClientProperties(client)
 		console.log("[Base de Datos] Lista.")
-		await client.db.set('1311782674964418640.matchs', [])
-
 		const array = [`CB:HB Bot Oficial | iNahilC.`]
+
 		setInterval(() => {
 			client.user.setPresence({
 				activities: [

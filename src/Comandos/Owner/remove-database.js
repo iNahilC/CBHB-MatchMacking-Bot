@@ -1,10 +1,10 @@
-const { SlashCommand, EmbedBuilder } = require('../../ConfigBot/index.js');
+const { SlashCommand, EmbedBuilder, PermissionsBitField } = require('../../ConfigBot/index.js');
 const { removeUserRankRole } = require('../../Utilidades/updateUserRankRole.js');
 const { updateEloTable } = require('../../Utilidades/updateEloTable.js');
 
 module.exports = new SlashCommand({
     name: 'remove-database',
-    category: 'Administración',
+    category: 'Role Verifier',
     description: 'Elimina un usuario de la base de datos y restablece sus roles y nombre.',
     example: '/remove-database usuario: @Usuario',
     only_owner: true,
@@ -17,9 +17,20 @@ module.exports = new SlashCommand({
         },
     ],
     ejecutar: async (client, interaction) => {
+        if (interaction.guild.id !== "1327694586864341112") return interaction.reply({
+			content: `${client.emojisId.error} No puedes utilizar este comando aqui!`,
+			flags: 64,
+		})
+
         try {
             await interaction.deferReply();
-
+            if (!interaction.member.permissions.has(PermissionsBitField.Flags.Admin)) {
+                const e = new EmbedBuilder()
+                    .setColor(client.colors.error)
+                    .setDescription(`${client.emojisId.error} **No tienes permisos para usar este comando.**`);
+                return interaction.reply({ embeds: [e], allowedMentions: { repliedUser: false } });
+            }
+    
             const userInput = interaction.options.getString('usuario');
             const userId = userInput.replace(/[<@!>]/g, '');
             if (!userId || !/^\d+$/.test(userId)) {
@@ -32,7 +43,7 @@ module.exports = new SlashCommand({
                 });
             }
 
-            const eloData = await client.db.get(`${interaction.guild.id}.elo`) || [];
+            const eloData = await client.db.get(`1311782674964418640.season2`) || [];
             const userIndex = eloData.findIndex(entry => entry.user_id === userId);
             
             if (userIndex === -1) {
@@ -45,20 +56,20 @@ module.exports = new SlashCommand({
                 });
             }
 
-            await client.db.set(`${interaction.guild.id}.elo`, eloData);
+            await client.db.set(`1311782674964418640.season2`, eloData);
             
-            const guild = client.guilds.cache.get(interaction.guild.id);
+            const guild = client.guilds.cache.get("1311782674964418640");
             const member = await guild.members.fetch(userId).catch(() => null);
             
             if (member) {
-                await removeUserRankRole(client, interaction.guild.id, userId);
+                await removeUserRankRole(client, "1311782674964418640", userId);
                 
                 const cleanName = member.displayName.replace(/\[[^\]]*\]\s*/, '');
                 await member.setNickname(cleanName).catch(() => {});
             }
 
             // Actualizar tabla de ELO
-            await updateEloTable(client, interaction.guild.id);
+            await updateEloTable(client, "1311782674964418640");
 
             return interaction.editReply({
                 embeds: [

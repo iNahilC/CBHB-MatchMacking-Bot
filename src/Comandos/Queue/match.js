@@ -16,7 +16,7 @@ const CANALES_PERMITIDOS = [
 
 module.exports = new SlashCommand({
     name: 'match',
-    category: 'Elo Adder',
+    category: 'Owner',
     description: 'Crea una partida!',
     example: '/match [server_link: <link>]',
     options: [
@@ -28,6 +28,11 @@ module.exports = new SlashCommand({
         },
     ],
     ejecutar: async (client, interaction) => {
+        if (interaction.channel.id !== "1324923267005415486") return interaction.reply({
+			content: `${client.emojisId.error} No puedes utilizar este comando aqui!`,
+			flags: 64,
+		})
+        
         await interaction.deferReply({ flags: 64 });
 
         // Verificar si el usuario está en un canal de voz permitido

@@ -8,26 +8,32 @@ function initializeClientProperties(client) {
 		verifyRolId: "1311869127333249085", //Rol de Verificar"
 	}
 
+	client.api = {
+		bloxlink: "6f5e8132-32ff-4954-9292-3cb66d5a3dbf"
+	}
+
 	client.elo = {
-		permissionRol: '1311860253696065717',
-		channel: '1331414581779890308',
-		message: '1332060188815130635',
-		ranks: {
-			rango6: '1318648000779780096', // Rango 6
-			rango5: '1318647994702368788', // Rango 5
-			rango4: '1318647992286449725', // Rango 4
-			rango3: '1311862776259416124', // Rango 3
-			rango2: '1311862590779031664', // Rango 2
-			rango1: '1311862422658613268', // Rango 1
-			rango0: '1311863014818844743', // Rango 0
-		},
-		logs: {
-			agregar: '1329155046897750086',
-			remover: '1329155266587136101',
-			establecer: '1329155110135402628',
-			eliminar: '1329155182524891271',
-			rangos: '1329154929197060137',
-		},
+	topFiveChannel: "1335112789848621156",  //CHANNEL_TABLA_TOP_5
+	topFiveMessage: "1335114103345123390",  //MESSAGE_TABLA_TOP_5
+	eloAdderChannel: "1335078125763301446", //CHANNEL
+	permissionRol: '1311860253696065717',   //ROL_ELO_ADDER
+	channel: '1331414581779890308',         //CHANNEL_TABLA_TOP_30
+	message: '1332060188815130635',         //MESSAGE_TABLA_TOP_30
+	ranks: {
+		rango6: '1318648000779780096', // Rango 6
+		rango5: '1318647994702368788', // Rango 5
+		rango4: '1318647992286449725', // Rango 4
+		rango3: '1311862776259416124', // Rango 3
+		rango2: '1311862590779031664', // Rango 2
+		rango1: '1311862422658613268', // Rango 1
+		rango0: '1311863014818844743', // Rango 0
+	},
+	logs: {
+		agregar: '1329155046897750086',     //CHANNEL_AGREGAR_ELO
+		remover: '1329155266587136101',     //CHANNEL_REMOVER_ELO
+		establecer: '1329155110135402628',  //CHANNEL_ESTABLECER_ELO
+		eliminar: '1329155182524891271',    //CHANNEL_ELIMINAR_ELO
+	},
 	}
 
 	client.constants = {
@@ -63,6 +69,8 @@ function initializeClientProperties(client) {
 		arrowLeft: '<:arrow_left:935043629779652648>',
 		arrowRight: '<:arrow_right:935043630014545961>',
 		search: '<:search_emoji:934731150797180948>',
+		sumar: '<:plus:744046576686596156>',
+		restar: '<:minus:744046527730810932>',
 	}
 }
 module.exports = { initializeClientProperties }

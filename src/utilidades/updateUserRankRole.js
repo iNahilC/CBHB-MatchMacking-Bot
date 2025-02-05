@@ -15,7 +15,7 @@ async function updateUserRankRole(client, guildId, userId, eloData) {
 
     const entradaUsuarioElo = eloData 
         ? eloData.find(entry => entry.user_id === userId)
-        : (await client.db.get(`${guildId}.elo`) || []).find(entry => entry.user_id === userId);
+        : (await client.db.get(`${guildId}.season2`) || []).find(entry => entry.user_id === userId);
 
     if (!entradaUsuarioElo) return null;
 
@@ -57,7 +57,7 @@ async function updateUserRankRole(client, guildId, userId, eloData) {
         const nuevoNombre = `[${rangoSymbol}] ${usuario.displayName.replace(/\[.*?\]\s*/g, '')}`;
         await usuario.setNickname(nuevoNombre);
     } catch (error) {
-        console.error(`Error actualizando apodo de ${usuario.user.tag}:`, error);
+        console.error(`Error actualizando apodo de ${usuario.user.tag}`, error.message);
     }
 
     return {
@@ -97,7 +97,7 @@ async function removeUserRankRole(client, guildId, userId) {
 }
 
 async function getRank(client, guildId, userId) {
-	const eloData = (await client.db.get(`${guildId}.elo`)) || []
+	const eloData = (await client.db.get(`${guildId}.season2`)) || []
 	const usuarioElo = eloData.find((entry) => entry.user_id === userId)
 
 	if (!usuarioElo) return 0

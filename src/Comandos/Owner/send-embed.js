@@ -2,7 +2,7 @@ const { SlashCommand, EmbedBuilder } = require('../../ConfigBot/index.js')
 
 module.exports = new SlashCommand({
 	name: 'send-embed',
-	category: 'Elo Adder',
+	category: 'Owner',
 	description: 'Envia un embed a un canal.',
 	example: '/send-embed',
 	options: [
@@ -20,6 +20,10 @@ module.exports = new SlashCommand({
 		}
 	],
 	ejecutar: async (client, interaction) => {
+		if (interaction.channel.id !== "1324923267005415486") return interaction.reply({
+			content: `${client.emojisId.error} No puedes utilizar este comando aqui!`,
+			flags: 64,
+		})
 		const canal = interaction.options.getChannel('canal')
 		const mensaje = interaction.options.getString('mensaje')
 		const e = new EmbedBuilder()

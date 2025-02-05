@@ -38,11 +38,11 @@ module.exports = new SlashCommand({
                 return interaction.editReply({ embeds: [e] });
             }
 
-            if (!client.db.has(`${interaction.guild.id}.elo`)) {
-                await client.db.set(`${interaction.guild.id}.elo`, []);
+            if (!client.db.has(`${interaction.guild.id}.season2`)) {
+                await client.db.set(`${interaction.guild.id}.season2`, []);
             }
 
-            const elo = (await client.db.get(`${interaction.guild.id}.elo`)) || [];
+            const elo = (await client.db.get(`${interaction.guild.id}.season2`)) || [];
             const resultados = [];
             const errores = [];
             const logs = [];
@@ -77,7 +77,7 @@ module.exports = new SlashCommand({
 				}
 			}
 
-            await client.db.set(`${interaction.guild.id}.elo`, elo);
+            await client.db.set(`${interaction.guild.id}.season2`, elo);
             await updateEloTable(client, interaction.guild.id);
 
             await sendLogs(client, interaction, 'DELETE', logs);

@@ -6,7 +6,7 @@ const { sendLogs } = require('../../Utilidades/sendLogs.js')
 
 module.exports = new SlashCommand({
 	name: 'remove',
-	category: 'Elo Adder',
+	category: 'Owner',
 	description: 'Remueve elo a los jugadores, asegurando que no sea menor a 0.',
 	example: '/remove usuarios: <@usuario1><@usuario2> cantidades: 10, 15',
 	options: [
@@ -27,8 +27,8 @@ module.exports = new SlashCommand({
 		try{
 			await interaction.deferReply()
 
-			if (!client.db.has(`${interaction.guild.id}.elo`)) {
-				await client.db.set(`${interaction.guild.id}.elo`, [])
+			if (!client.db.has(`${interaction.guild.id}.season2`)) {
+				await client.db.set(`${interaction.guild.id}.season2`, [])
 			}
 	
 			if (!interaction.member.roles.cache.has(client.elo.permissionRol)) {
@@ -70,7 +70,7 @@ module.exports = new SlashCommand({
 				return interaction.editReply({ embeds: [e], allowedMentions: { repliedUser: false } })
 			}
 	
-			const elo = (await client.db.get(`${interaction.guild.id}.elo`)) || []
+			const elo = (await client.db.get(`${interaction.guild.id}.season2`)) || []
 			let resultados = []
 			let cambiosRoles = []
 	
@@ -104,7 +104,7 @@ module.exports = new SlashCommand({
 				resultados.push({ userId, totalElo, cantidadElo, eloPrevio })
 			}
 	
-			await client.db.set(`${interaction.guild.id}.elo`, elo)
+			await client.db.set(`${interaction.guild.id}.season2`, elo)
 			await updateEloTable(client, interaction.guild.id)
 	
 			const genRandomId = randomId(10, 'alphanumeric')

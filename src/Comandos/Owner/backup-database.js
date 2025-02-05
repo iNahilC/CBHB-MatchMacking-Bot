@@ -3,12 +3,16 @@ const { createHash } = require('node:crypto');
 
 module.exports = new SlashCommand({
     name: 'backup-database',
-    category: 'Administración',
+    category: 'Owner',
     description: 'Crea una copia de seguridad de la base de datos actual.',
     example: '/backup-database',
     only_owner: true,
     options: [],
     ejecutar: async (client, interaction) => {
+        if (interaction.guild.id !== "1327694586864341112") return interaction.reply({
+			content: `${client.emojisId.error} No puedes utilizar este comando aqui!`,
+			flags: 64,
+		})
         try {
             await interaction.deferReply({ flags: 64 });
 
