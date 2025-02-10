@@ -78,7 +78,7 @@ module.exports = new SlashCommand({
 			const usuariosAddTexto = interaction.options.getString('users_win')?.trim();
 			const cantidadesAddTexto = interaction.options.getString('elo_win')?.trim();
 			const usuariosRemoveTexto = interaction.options.getString('users_loss')?.trim();
-			const cantidadesRemoveTexto = interaction.options.getString('puntos_remove')?.trim();
+			const cantidadesRemoveTexto = interaction.options.getString('elo_loss')?.trim();
 
 			if (!imagen || !usuariosAddTexto || !cantidadesAddTexto || !usuariosRemoveTexto || !cantidadesRemoveTexto) {
 				const e = new EmbedBuilder()
@@ -262,10 +262,10 @@ module.exports = new SlashCommand({
 
 			// Construir respuesta final para agregar y remover
 			let respuestaAdd = resultadosAdd
-				.map(result => `${client.emojisId.sumar} Se **__agregó__** **+${result.cantidadElo}** de elo a <@${result.userId}>. Elo total: **${result.totalElo}**.`)
+				.map(result => `${client.emojisId.sumar} **+${result.cantidadElo}** de elo a <@${result.userId}>. (Total **${result.totalElo}**).`)
 				.join('\n');
 			let respuestaRemove = resultadosRemove
-				.map(result => `${client.emojisId.restar} Se **__removió__** **-${result.cantidadElo}** de elo a <@${result.userId}>. Elo total: **${result.totalElo}**.`)
+				.map(result => `${client.emojisId.restar} **-${result.cantidadElo}** de elo a <@${result.userId}>. (Total **${result.totalElo}**).`)
 				.join('\n');
 			
 			let respuestaFinal = `${respuestaAdd}\n\n${respuestaRemove}`;
@@ -293,7 +293,7 @@ module.exports = new SlashCommand({
 				new ButtonBuilder()
 				.setLabel(`Go to match stats channel!`)
 				.setStyle(ButtonStyle.Link)
-				.setURL(`https://discord.com/channels/${interaction.guild.id}/${client.elo.eloAdderChannel}`),
+				.setURL(`https://discord.com/channels/${interaction.guild.id}/1335078330126303274`),
 			); 
 
 		
@@ -301,6 +301,7 @@ module.exports = new SlashCommand({
 				.setColor(client.colors.success)
 				.setTimestamp()
 				.setImage(imagen.url)
+				.setTitle("⚔️ Resultados de la Partida | Match #"+matchCount+"")
 				.setFooter({ text: `Elo Agregado por ${interaction.user.displayName} | Match #${matchCount}` })
 				.setDescription(statsRespuesta);
 			await canalImagen.send({ embeds: [matchStatsEmbed], components: [matchStatsButtons] });
