@@ -1,20 +1,14 @@
-const { 
-    SlashCommand, 
-    EmbedBuilder, 
-    ButtonBuilder, 
-    ActionRowBuilder, 
-    ButtonStyle 
-} = require('../../ConfigBot/index.js');
+const { SlashCommand, EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('../../ConfigBot/index.js');
 const { updateEloTable } = require('../../Utilidades/updateEloTable.js');
 const { updateUserRankRole } = require('../../Utilidades/updateUserRankRole.js');
 const { sendLogs } = require('../../Utilidades/sendLogs.js');
 const { randomId } = require('../../Utilidades/randomString.js');
 
 module.exports = new SlashCommand({
-    name: 'empate',
+    name: 'tie',
     category: 'Elo Adder',
     description: 'Agrega +15 puntos de elo a todos los jugadores en caso de empate.',
-    example: '/empate match-image: [archivo] usuarios_terroristas: @user1 @user2... usuarios_counter: @user6 @user7...',
+    example: '/tie match-image: [archivo] usuarios_terroristas: @user1 @user2... usuarios_counter: @user6 @user7...',
     options: [
         {
             name: 'match-image',
