@@ -6,7 +6,7 @@ const LIMITES = {
   ROLES: 2, // Si hace 2 cambios en los roles en <=1.5s se considera raid
   EMOJIS: 3, // Si hace 3 cambios en los emojis en <=1.5s se considera raid
   NOMBRES_CANALES: 2, // Si hace 2 cambios en el nombre de canales en <=1.5s se considera raid
-  INTERVALO: 1500 // 1.5 segundos
+  INTERVALO: 15 * 100 // 1.5 segundos
 };
 
 const mapaWebhooks = new Map();
@@ -73,7 +73,7 @@ async function detectarRaid(userId, tipoAccion, afectado) {
   const ahora = Date.now();
   const registro = raidTracker.get(userId) || { counts: {}, firstTimestamp: {}, primerAfectado: {} };
 
-  if (!registro.firstTimestamp[tipoAccion]) {
+  if (!registro.firstTimestamp[tipoAccion]) { 
     registro.firstTimestamp[tipoAccion] = ahora;
     registro.primerAfectado[tipoAccion] = afectado; // Guardar el primer caso creado
   }
@@ -82,15 +82,17 @@ async function detectarRaid(userId, tipoAccion, afectado) {
 
   const tiempoTranscurrido = ahora - registro.firstTimestamp[tipoAccion];
 
-  console.log(`[DEBUG] ${userId} - ${tipoAccion}: ${registro.counts[tipoAccion]} en ${tiempoTranscurrido}ms`);
+  console.log(`[DEBUG] ${userId} - ${tipoAccion}: ${registro.counts[tipoAccion]} en ${tiempoTranscurrido}ms <= ${LIMITES.INTERVALO}ms`);
 
-  if (tiempoTranscurrido <= LIMITES.INTERVALO * 1000) {
-    if (registro.counts[tipoAccion] >= LIMITES[tipoAccion]) {
+  if (tiempoTranscurrido <= LIMITES.INTERVALO) { // Si el tiempo transcurrido es menor o igual al límite
+    if (registro.counts[tipoAccion] >= LIMITES[tipoAccion]) { 
       const primerAfectado = registro.primerAfectado[tipoAccion];
       registro.counts[tipoAccion] = 0;
       registro.firstTimestamp[tipoAccion] = ahora;
       registro.primerAfectado[tipoAccion] = null;
       raidTracker.set(userId, registro);
+      
+      console.log(`[DETECTADO] ${userId} - ${tipoAccion}: ${registro.counts[tipoAccion]} en ${tiempoTranscurrido}ms <= ${LIMITES.INTERVALO}ms`);
       return [primerAfectado, afectado]; // Devolver los dos objetos afectados
     }
   } else {
