@@ -1,6 +1,6 @@
 {
   "name": "cbhb-matchmacking-bot",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Discord bot for the CB:HB MatchMacking server.",
   "main": "index.js",
   "scripts": {
@@ -13,6 +13,7 @@
     "better-sqlite3": "^11.8.0",
     "discord.js": "^14.17.3",
     "djs-voice": "^1.2.0",
+    "fs": "^0.0.1-security",
     "moment": "^2.30.1",
     "moment-duration-format": "^2.3.2",
     "moment-timezone": "^0.5.46",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
+    "@types/express": "^5.0.0",
     "@types/randomstring": "^1.3.0",
     "eslint": "^9.18.0",
     "globals": "^15.14.0"
