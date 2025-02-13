@@ -23,7 +23,7 @@ module.exports = new SlashCommand({
 		try {
 			await interaction.deferReply();
 
-			if (!interaction.member.permissions.has(PermissionsBitField.Flags.Admin)) {
+			if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
 				const e = new EmbedBuilder()
 					.setColor(client.colors.error)
 					.setDescription(`${client.emojisId.error} **No tienes permisos para usar este comando.**`);
@@ -57,6 +57,8 @@ module.exports = new SlashCommand({
 			}
 
 			const verifyRolId = client.mm.verifyRolId;
+			const firstRankRoleId = client.elo.ranks.rango0;
+
 			let resultados = [];
 
 			// Iterar sobre cada usuario mencionado y asignarle el nombre correspondiente.
@@ -76,12 +78,10 @@ module.exports = new SlashCommand({
 				}
 
 				try {
-					// Asignar rol de verificado
-					await miembro.roles.add(verifyRolId);
-
-					// Asignar el nuevo nickname con el prefijo [⓪] y el nombre correspondiente
 					const nuevoNick = `[⓪] ${nombresArray[i]}`;
+
 					await miembro.setNickname(nuevoNick);
+					await miembro.roles.set([verifyRolId, firstRankRoleId]);
 
 					resultados.push(`✔️ Se ha verificado y actualizado el nick a \`${nuevoNick}\` a <@${userId}>.`);
 				} catch (error) {

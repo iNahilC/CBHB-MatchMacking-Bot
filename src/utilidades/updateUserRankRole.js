@@ -69,6 +69,7 @@ async function updateUserRankRole(client, guildId, userId, eloData) {
 
 async function removeUserRankRole(client, guildId, userId) {
 	const RANGOS = [
+        client.elo.ranks.rango0,
 		client.elo.ranks.rango1,
 		client.elo.ranks.rango2,
 		client.elo.ranks.rango3,
