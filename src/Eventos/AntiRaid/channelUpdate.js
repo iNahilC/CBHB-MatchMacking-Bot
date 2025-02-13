@@ -1,85 +1,101 @@
+// channelUpdate.js
 const { Evento, ChannelType } = require('../../ConfigBot/index.js');
 const { detectarRaid, sancionarUsuario } = require('../../Utilidades/detectRaid.js');
 
 module.exports = new Evento({
-  nombre: "channelDelete",
-  ejecutar: async (client, channel) => {
-    if (channel.guild.id !== client.mm.serverId) return;
-
+  nombre: "channelUpdate",
+  ejecutar: async (client, oldChannel, newChannel) => {
+    if (oldChannel.guild.id !== client.mm.serverId) return;
+  
     try {
-      const auditLogs = await channel.guild.fetchAuditLogs({
-        type: 12, // CHANNEL_DELETE
-        limit: 1
+      const auditLogs = await oldChannel.guild.fetchAuditLogs({
+        type: 11,
+        limit: 10
       });
-      const entry = auditLogs.entries.first();
+  
+      const entry = auditLogs.entries.find(e =>
+        e.target?.id === newChannel.id && (Date.now() - e.createdTimestamp < 10000)
+      );
       if (!entry) return;
-
+  
       const ejecutor = entry.executor;
-      if (!ejecutor || ejecutor.id === client.user.id) return;
-
-      const miembro = channel.guild.members.cache.get(ejecutor.id);
+      if (ejecutor.id === client.user.id) return;
+  
+      const miembro = oldChannel.guild.members.cache.get(ejecutor.id);
       if (!miembro) return;
+  
+      const canalesSospechosos = await detectarRaid(ejecutor.id, 'CANALES', newChannel);
+      if (canalesSospechosos) {
+        const canalesARevisar = Array.isArray(canalesSospechosos) ? canalesSospechosos : [canalesSospechosos];
 
-      const esRaid = await detectarRaid(ejecutor.id, 'CANALES');
-      if (esRaid) {
-        console.log(`🚨 Sancionando a ${ejecutor.tag} por eliminación sospechosa de canales.`);
+        console.log(`🚨 Sancionando a ${ejecutor.tag} por actividad sospechosa.`);
         await sancionarUsuario(client, miembro);
 
-        let parentCategory = channel.parentId ? await channel.guild.channels.fetch(channel.parentId).catch(() => null) : null;
-        
-        // Si la categoría no existe, intenta restaurarla
-        if (!parentCategory && channel.parentId) {
-          console.log(`⚠️ Categoría con ID ${channel.parentId} eliminada, restaurando...`);
-          parentCategory = await channel.guild.channels.create({
-            name: "Categoría Restaurada",
-            type: ChannelType.GuildCategory,
-            reason: "Anti-raid: Categoría eliminada, restaurada automáticamente"
-          }).catch(console.error);
+        for (const canal of canalesARevisar) {
+          if (!canal) {
+            console.warn("⚠️ Canal sospechoso es null o indefinido. Saltando...");
+            continue;
+          }
+
+          const restoredData = {};
+
+          if (oldChannel.name && oldChannel.name !== canal.name) {
+            restoredData.name = oldChannel.name;
+          }
+
+          if (canal.type === ChannelType.GuildText) {
+            if (oldChannel.topic !== canal.topic) {
+              restoredData.topic = oldChannel.topic;
+            }
+            if (oldChannel.rateLimitPerUser !== canal.rateLimitPerUser) {
+              restoredData.rateLimitPerUser = oldChannel.rateLimitPerUser;
+            }
+          }
+
+          if (oldChannel.nsfw !== canal.nsfw) {
+            restoredData.nsfw = oldChannel.nsfw;
+          }
+
+          if (canal.type === ChannelType.GuildVoice || canal.type === ChannelType.GuildStageVoice) {
+            if (oldChannel.bitrate !== canal.bitrate) {
+              restoredData.bitrate = oldChannel.bitrate;
+            }
+            if (oldChannel.userLimit !== canal.userLimit) {
+              restoredData.userLimit = oldChannel.userLimit;
+            }
+          }
+
+          if (oldChannel.parentId !== canal.parentId) {
+            restoredData.parent = oldChannel.parentId;
+          }
+
+          const oldOverwrites = oldChannel.permissionOverwrites.cache;
+          restoredData.permissionOverwrites = oldOverwrites.map(po => ({
+            id: po.id,
+            allow: po.allow.bitfield,
+            deny: po.deny.bitfield,
+            type: po.type
+          }));
+
+          if (Object.keys(restoredData).length > 0) {
+            await canal.edit(restoredData, { reason: 'Recuperación anti-raid: Revirtiendo cambios sospechosos' });
+          }
+
+          console.log(`✅ Se han revertido los cambios en el canal "${canal.name}".`);
         }
 
-        const newChannelConfig = {
-          name: channel.name,
-          type: channel.type,
-          permissionOverwrites: channel.permissionOverwrites.cache.map(overwrite => ({
-            id: overwrite.id,
-            allow: overwrite.allow.bitfield,
-            deny: overwrite.deny.bitfield,
-            type: overwrite.type,
-          })),
-          nsfw: channel.nsfw,
-          reason: "Anti-raid: Canal eliminado por un raider, restaurado automáticamente"
-        };
-
-        if (channel.type === ChannelType.GuildText) {
-          newChannelConfig.topic = channel.topic || null;
-          newChannelConfig.rateLimitPerUser = channel.rateLimitPerUser || 0;
-        }
-
-        if (channel.type === ChannelType.GuildVoice || channel.type === ChannelType.GuildStageVoice) {
-          newChannelConfig.bitrate = channel.bitrate;
-          newChannelConfig.userLimit = channel.userLimit;
-        }
-
-        if (parentCategory) {
-          newChannelConfig.parent = parentCategory.id;
-        }
-
-        const newChannel = await channel.guild.channels.create(newChannelConfig).catch(console.error);
-        if (newChannel && typeof channel.position === "number") {
-          await newChannel.setPosition(channel.position).catch(console.error);
-        }
-
-        console.log(`✅ Canal "${channel.name}" restaurado en la posición ${channel.position}`);
-
-        const logsChannel = await channel.guild.channels.fetch(client.mm.raidLogs).catch(() => null);
+        const logsChannel = await oldChannel.guild.channels.fetch(client.mm.raidLogs);
         if (logsChannel) {
-          await logsChannel.send(`✅ Canal **"${channel.name}"** eliminado por **${miembro.user.tag}** fue restaurado automáticamente.`);
-        } else {
-          console.log('⚠️ No se encontró el canal de logs con el ID client.mm.raidLogs.');
+          const canalesRevertidos = canalesARevisar
+            .filter(c => c !== null)
+            .map(c => `"${c.name}"`)
+            .join(", ");
+
+          await logsChannel.send(`✅ Se han revertido los cambios en los canales ${canalesRevertidos} realizados por ${ejecutor.tag || ejecutor.username}.`);
         }
       }
     } catch (error) {
-      console.error("❌ Error en anti-raid (channelDelete):", error);
+      console.error("Error en channelUpdate anti-raid:", error);
     }
   }
 });

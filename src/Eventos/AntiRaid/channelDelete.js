@@ -25,10 +25,21 @@ module.exports = new Evento({
         console.log(`🚨 Sancionando a ${ejecutor.tag} por eliminación sospechosa de canales.`);
         await sancionarUsuario(client, miembro);
 
+        let parentCategory = channel.parentId ? await channel.guild.channels.fetch(channel.parentId).catch(() => null) : null;
+        
+        if (!parentCategory && channel.parentId) {
+          console.log(`⚠️ Categoría con ID ${channel.parentId} eliminada, restaurando...`);
+          parentCategory = await channel.guild.channels.create({
+            name: "Categoría Restaurada",
+            type: ChannelType.GuildCategory,
+            reason: "Anti-raid: Categoría eliminada, restaurada automáticamente"
+          }).catch(console.error);
+        }
+
         const newChannelConfig = {
           name: channel.name,
           type: channel.type,
-          permissionOverwrites: channel.permissionOverwrites.cache.map((overwrite) => ({
+          permissionOverwrites: channel.permissionOverwrites.cache.map(overwrite => ({
             id: overwrite.id,
             allow: overwrite.allow.bitfield,
             deny: overwrite.deny.bitfield,
@@ -48,8 +59,8 @@ module.exports = new Evento({
           newChannelConfig.userLimit = channel.userLimit;
         }
 
-        if (channel.parentId) {
-          newChannelConfig.parent = channel.parentId;
+        if (parentCategory) {
+          newChannelConfig.parent = parentCategory.id;
         }
 
         const newChannel = await channel.guild.channels.create(newChannelConfig).catch(console.error);
