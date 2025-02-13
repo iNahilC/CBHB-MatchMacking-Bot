@@ -73,17 +73,9 @@ async function sendLogs(client, interaction, type, details = []) {
             eloAnterior,
             componentId,
         });
-
-        // Registrar el componente (si no existe ya)
-        const storedComponentsId = await client.db.get(`${interaction.guild.id}.activeComponents`) || [];
-        if (!storedComponentsId.some(entry => entry.id === componentId)) {
-            storedComponentsId.push({ id: componentId, type: logTypeKey, targetUser });
-            await client.db.set(`${interaction.guild.id}.activeComponents`, storedComponentsId);
-        }
     }
 
     try {
-        // Enviar un embed por cada entrada en logEntries
         for (const entry of logEntries) {
             const embed = new EmbedBuilder()
                 .setColor(client.colors.success)

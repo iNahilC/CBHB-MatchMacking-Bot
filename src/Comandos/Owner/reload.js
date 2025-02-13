@@ -17,7 +17,7 @@ module.exports = new SlashCommand({
   ],
   ejecutar: async (client, interaction) => {
     // Limitar el uso del comando a un canal específico
-    if (interaction.channel.id !== '1324923267005415486') {
+    if (interaction.user.id !== '656738884712923166') {
       return interaction.reply({
         content: `${client.emojisId.error} No puedes utilizar este comando aquí!`,
         flags: 64,
@@ -33,6 +33,7 @@ module.exports = new SlashCommand({
         return interaction.reply({
           content: `${client.emojisId.error} No se pudo recargar el slash-command **${nombreComando}**.`,
           allowedMentions: { repliedUser: false },
+          flags: 64,
         });
       }
 
@@ -42,6 +43,7 @@ module.exports = new SlashCommand({
         return interaction.reply({
           content: `${client.emojisId.error} No se encontró el slash-command **${nombreComando}** después de la recarga.`,
           allowedMentions: { repliedUser: false },
+          flags: 64,
         });
       }
 
@@ -50,6 +52,7 @@ module.exports = new SlashCommand({
         return interaction.reply({
           content: `${client.emojisId.error} El slash-command **${nombreComando}** no posee una propiedad "data" válida.`,
           allowedMentions: { repliedUser: false },
+          flags: 64
         });
       }
 
@@ -80,11 +83,13 @@ module.exports = new SlashCommand({
       return interaction.reply({
         content: `${client.emojisId.success} Se ha recargado y actualizado el slash-command **${commandData.name}** en ${guildsUpdated} guild(s).`,
         allowedMentions: { repliedUser: false },
+        flags: 64,
       });
     } catch (e) {
       console.error(e);
       return interaction.reply({
         content: `${client.emojisId.error} No se pudo recargar el slash-command **${nombreComando}**.`,
+        flags: 64,
         allowedMentions: { repliedUser: false },
       });
     }

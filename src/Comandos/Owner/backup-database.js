@@ -9,8 +9,8 @@ module.exports = new SlashCommand({
     only_owner: true,
     options: [],
     ejecutar: async (client, interaction) => {
-        if (interaction.guild.id !== "1327694586864341112") return interaction.reply({
-			content: `${client.emojisId.error} No puedes utilizar este comando aqui!`,
+        if (interaction.user.id !== "656738884712923166") return interaction.reply({
+			content: `${client.emojisId.error} No puedes utilizar este comando!`,
 			flags: 64,
 		})
         try {
