@@ -5,7 +5,9 @@ function initializeClientProperties(client) {
 	client.servidor_test = '656754930652151808'
 
 	client.mm = {
-		verifyRolId: "1311869127333249085", //Rol de Verificar"
+		verifyRolId: "1311869127333249085", //Rol de Verificar",
+		serverId: "1311782674964418640", //ID del servidor
+		raidLogs: "1338640855434657832", //ID del canal de logs
 	}
 
 	client.api = {
