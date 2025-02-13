@@ -24,7 +24,7 @@ module.exports = new Evento({
                 await message.edit(`
 # ✅ **[ Bot Active ]**
 
-**The bot has been active since <t:${Math.floor(startTime / 1000)}:R>**
+**The bot has been active since <t:${Math.floor(startTime / 1000)}:f> (<t:${Math.floor(startTime / 1000)}:R>)**
                     `);
             } catch (error) {
                 console.error('❌ Error editing the message:', error);

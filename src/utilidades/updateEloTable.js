@@ -14,19 +14,19 @@ async function updateEloTable(client, guildId) {
         if (!Array.isArray(usuariosSeason2)) usuariosSeason2 = [];
         if (!Array.isArray(usuariosSeason1)) usuariosSeason1 = [];
 
-        const RANGOS = [
-            { eloMinimo: 1800, eloMaximo: Infinity, nombre: '6' },
-            { eloMinimo: 1300, eloMaximo: 1799, nombre: '5' },
-            { eloMinimo: 1000, eloMaximo: 1299, nombre: '4' },
-            { eloMinimo: 500, eloMaximo: 999, nombre: '3' },
-            { eloMinimo: 300, eloMaximo: 499, nombre: '2' },
-            { eloMinimo: 50, eloMaximo: 299, nombre: '1' },
-            { eloMinimo: 0, eloMaximo: 49, nombre: '0' },
-        ];
+            // const RANGOS = [
+            //     { eloMinimo: 1800, eloMaximo: Infinity, nombre: '6' },
+            //     { eloMinimo: 1300, eloMaximo: 1799, nombre: '5' },
+            //     { eloMinimo: 1000, eloMaximo: 1299, nombre: '4' },
+            //     { eloMinimo: 500, eloMaximo: 999, nombre: '3' },
+            //     { eloMinimo: 300, eloMaximo: 499, nombre: '2' },
+            //     { eloMinimo: 50, eloMaximo: 299, nombre: '1' },
+            //     { eloMinimo: 0, eloMaximo: 49, nombre: '0' },
+            // ];
 
-        function obtenerRango(elo) {
-            return RANGOS.find(r => elo >= r.eloMinimo && elo <= r.eloMaximo)?.nombre || 'Desconocido';
-        }
+        // function obtenerRango(elo) {
+        //     return RANGOS.find(r => elo >= r.eloMinimo && elo <= r.eloMaximo)?.nombre || 'Desconocido';
+        // }
 
         usuariosSeason2.sort((a, b) => b.elo - a.elo);
         usuariosSeason1.sort((a, b) => b.elo - a.elo);
@@ -36,44 +36,44 @@ async function updateEloTable(client, guildId) {
 
         // --- Crear la tabla para Top 30 Season 2 ---
         const dataTop30Season2 = [
-            ['#', 'USUARIO', 'ELO', 'RANGO'],
+            ['#', 'USUARIO', 'ELO'],
             ...top30Season2.map((user, index) => {
-                const username = user.username || user.displayName;
-                return [`#${index + 1}`, username, user.elo.toLocaleString(), `#${obtenerRango(user.elo)}`];
+                const username = user.displayName;
+                return [`#${index + 1}`, username, user.elo.toLocaleString()];
             }),
         ];
 
         // --- Crear la tabla para Top 5 Season 2 ---
         const dataTop5Season2 = [
-            ['#', 'USUARIO', 'ELO', 'RANGO'],
+            ['#', 'USUARIO', 'ELO'],
             ...top5Season2.map((user, index) => {
-                const username = user.username || user.displayName;
-                return [`#${index + 1}`, username, user.elo.toLocaleString(), `#${obtenerRango(user.elo)}`];
+                const username = user.displayName;
+                return [`#${index + 1}`, username, user.elo.toLocaleString()];
             }),
         ];
 
         // --- Crear la tabla para Top 5 Season 1 ---
         const dataTop5Season1 = [
-            ['#', 'USUARIO', 'ELO', 'RANGO'],
+            ['#', 'USUARIO', 'ELO'],
             ...top5Season1.map((user, index) => {
-                const username = user.username || user.displayName;
-                return [`#${index + 1}`, username, user.elo.toLocaleString(), `#${obtenerRango(user.elo)}`];
+                const username =    user.displayName;
+                return [`#${index + 1}`, username, user.elo.toLocaleString()];
             }),
         ];
 
         // Crear las tablas con la librería `table`
         const tableTop30Season2 = table(dataTop30Season2, {
-            columns: { 0: { alignment: 'center' }, 1: { alignment: 'left' }, 2: { alignment: 'center' }, 3: { alignment: 'center' } },
+            columns: { 0: { alignment: 'center' }, 1: { alignment: 'left' }, 2: { alignment: 'center' } },
             drawHorizontalLine: (index) => index === 0 || index === 1 || index === dataTop30Season2.length,
         });
 
         const tableTop5Season2 = table(dataTop5Season2, {
-            columns: { 0: { alignment: 'center' }, 1: { alignment: 'left' }, 2: { alignment: 'center' }, 3: { alignment: 'center' } },
+            columns: { 0: { alignment: 'center' }, 1: { alignment: 'left' }, 2: { alignment: 'center' } },
             drawHorizontalLine: (index) => index === 0 || index === 1 || index === dataTop5Season2.length,
         });
 
         const tableTop5Season1 = table(dataTop5Season1, {
-            columns: { 0: { alignment: 'center' }, 1: { alignment: 'left' }, 2: { alignment: 'center' }, 3: { alignment: 'center' } },
+            columns: { 0: { alignment: 'center' }, 1: { alignment: 'left' }, 2: { alignment: 'center' } },
             drawHorizontalLine: (index) => index === 0 || index === 1 || index === dataTop5Season1.length,
         });
 
