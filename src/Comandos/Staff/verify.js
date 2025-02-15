@@ -23,24 +23,38 @@ module.exports = new SlashCommand({
 		try {
 			await interaction.deferReply();
 
-			if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-				const e = new EmbedBuilder()
+			// Validar si el comando se usa en el canal permitido
+			if (interaction.channelId !== '1318312576559354007') {
+				const embed = new EmbedBuilder()
+					.setColor(client.colors.error)
+					.setDescription(`${client.emojisId.error} **Este comando solo puede usarse en <#1318312576559354007>.**`);
+				return interaction.editReply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+			}
+
+			// Verificar permisos
+			const miembro = interaction.member;
+			const tienePermisos = miembro.permissions.has(PermissionsBitField.Flags.Administrator) ||
+				miembro.roles.cache.has(client.mm.moderatorRoleId) ||
+				miembro.roles.cache.has(client.mm.managerRoleId);
+
+			if (!tienePermisos) {
+				const embed = new EmbedBuilder()
 					.setColor(client.colors.error)
 					.setDescription(`${client.emojisId.error} **No tienes permisos para usar este comando.**`);
-				return interaction.editReply({ embeds: [e], allowedMentions: { repliedUser: false } });
+				return interaction.editReply({ embeds: [embed], allowedMentions: { repliedUser: false } });
 			}
 
 			// Obtener los parámetros
 			const usuariosTexto = interaction.options.getString('usuarios');
 			const nombresTexto = interaction.options.getString('nombres');
-			
+
 			// Extraer menciones
 			const usuarios = usuariosTexto.match(/<@!?\d+>/g);
 			if (!usuarios || usuarios.length === 0) {
-				const e = new EmbedBuilder()
+				const embed = new EmbedBuilder()
 					.setColor(client.colors.error)
 					.setDescription(`${client.emojisId.error} Debes **mencionar** a uno o varios **usuarios** válidos en el campo **"usuarios"**.`);
-				return interaction.editReply({ embeds: [e], allowedMentions: { repliedUser: false } });
+				return interaction.editReply({ embeds: [embed], allowedMentions: { repliedUser: false } });
 			}
 
 			// Dividir y limpiar la lista de nombres
@@ -50,14 +64,14 @@ module.exports = new SlashCommand({
 
 			// Si la cantidad de nombres no coincide con la cantidad de usuarios, se puede informar un error.
 			if (nombresArray.length !== usuarios.length) {
-				const e = new EmbedBuilder()
+				const embed = new EmbedBuilder()
 					.setColor(client.colors.error)
 					.setDescription(`${client.emojisId.error} La cantidad de nombres (${nombresArray.length}) no coincide con la cantidad de usuarios (${usuarios.length}).`);
-				return interaction.editReply({ embeds: [e], allowedMentions: { repliedUser: false } });
+				return interaction.editReply({ embeds: [embed], allowedMentions: { repliedUser: false } });
 			}
 
 			const verifyRolId = client.mm.verifyRolId;
-			const firstRankRoleId = client.elo.ranks.rango0;
+			const firstRankRoleId = client.elo.ranks.rango1;
 
 			let resultados = [];
 
@@ -78,12 +92,12 @@ module.exports = new SlashCommand({
 				}
 
 				try {
-					const nuevoNick = `[⓪] ${nombresArray[i]}`;
-
+					const nuevoNick = `[①] ${nombresArray[i]}`;
+					const oldNick = miembro.displayName;
 					await miembro.setNickname(nuevoNick);
 					await miembro.roles.set([verifyRolId, firstRankRoleId]);
 
-					resultados.push(`✔️ Se ha verificado y actualizado el nick a \`${nuevoNick}\` a <@${userId}>.`);
+					resultados.push(`✅ Se ha verificado y actualizado el nick de \`${oldNick}\` a <@${userId}>.`);
 				} catch (error) {
 					console.error(`Error al asignar el rol o actualizar el nick a <@${userId}>:`, error);
 					resultados.push(`❌ No se pudo verificar o actualizar el nick a <@${userId}> debido a un error.`);
@@ -99,7 +113,7 @@ module.exports = new SlashCommand({
 
 			return interaction.editReply({ embeds: [embed], allowedMentions: { repliedUser: false } });
 		} catch (error) {
-			console.log("comando /verificar", error.message);
+			console.error("Error en el comando /verificar:", error.message);
 			return interaction.editReply("¡Hubo un error interno!");
 		}
 	},
